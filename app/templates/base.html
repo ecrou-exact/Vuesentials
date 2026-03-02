@@ -1,64 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>
-        Vuesentials
-    </title>
-    <script src="{{ url_for('static',filename='js/popper.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='bootstrap-5.3.0/js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/jquery-ui.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/select2.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/vue.global.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/zxcvbn.js') }}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vuesentials</title>
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/select2.min.css') }}">
-    <link rel="stylesheet" type="text/css"
-        href="{{ url_for('static',filename='css/select2-bootstrap-5-theme.min.css') }}">
-
-    <link rel="stylesheet" type="text/css"
-        href="{{ url_for('static',filename='bootstrap-5.3.0/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css"
-        href="{{ url_for('static',filename='fontawesome-6.3.0/css/fontawesome.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='fontawesome-6.3.0/css/solid.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='fontawesome-6.3.0/css/brands.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/jquery-ui.css') }}">
-
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/core.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.3.0/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-6.3.0/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/select2-bootstrap-5-theme.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery-ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/sidebar.css') }}">
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row flex-nowrap">
+    <div class="container-fluid p-0">
+        <div class="d-flex flex-nowrap min-vh-100">
+
             {% include 'sidebar.html' %}
 
-            <!--Main layout-->
-            <main class="col ps-md-4 pt-2" id="main-container">
-                <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse"
-                    class="border rounded-3 p-1 text-decoration-none"><i class="fa-solid fa-bars-staggered"></i>
-                    Menu</a>
-                {% block content %}
-                {% endblock %}
+            <main class="col p-4" id="main-container">
+                <button class="btn btn-outline-secondary btn-sm btn-toggle-sidebar" data-bs-target="#sidebar"
+                    data-bs-toggle="collapse">
+                    <i class="fa-solid fa-bars-staggered"></i> Menu
+                </button>
+
+                <section class="content">
+                    {% block content %}{% endblock %}
+                </section>
             </main>
 
         </div>
     </div>
 
+    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-5.3.0/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/select2.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/vue.global.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/zxcvbn.js') }}"></script>
 
     {% block script %}
     <script type="module">
         const { createApp } = Vue
         createApp({
             delimiters: ['[[', ']]'],
-            setup() { }
+            setup() {
+                return {}
+            }
         }).mount('#main-container')
     </script>
     {% endblock %}
-
 </body>
 
 </html>
