@@ -1,50 +1,72 @@
-# P'tit Crolle
+# Vuesentials
 
-<img title="MarkText logo" src="https://github.com/DavidCruciani/ptit-crolle/blob/main/doc/crolle.png?raw=true" alt="Alt text" width="388" data-align="center">
+A Vue.js component library platform built with Flask.
 
-Flask application template
+![Vuesentials Logo](vuesentials_logo.svg)
 
-## What's in ?
+## What's Inside?
 
-- Vuejs3
-
-- Blueprints
-
-- Flask-Login
-
-- Flask-SQLAlchemy for databases
-
-- Flask-WTF for forms
-
-- Flask-session for sessions
-
-- Some roles are already created
+- Vue.js 3
+- Flask & SQLAlchemy
+- Component Gallery with Search & Filtering
+- Responsive Design
+- Dark Mode Support
 
 ## Installation
 
-**It is strongly recommended to use a virtual environment**
-
-If you want to know more about virtual environments, [python has you covered](https://docs.python.org/3/tutorial/venv.html)
-
 ```bash
+git clone https://github.com/ecrou-exact/Vuesentials.git
+cd Vuesentials
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-python3 app.py -i                            ## Initialize db
+python app.py -i
 ```
-
-## Config
-
-Edit `config.py`
-
-- `SECRET_KEY`: Secret key for the app
-
-- `FLASK_URL` : url for the instance
-
-- `FLASK_PORT`: port for the instance
-
-- `MISP_MODULE`: url and port where misp-module is running
 
 ## Launch
 
 ```bash
-./launch.sh -l
+./launch.sh -d
 ```
+
+Or manually:
+
+```bash
+python app.py
+```
+
+Then open: `http://localhost:5000`
+
+## Configuration
+
+Edit `config.py`:
+
+- `SECRET_KEY`: Change this!
+- `FLASK_PORT`: Port (default: 5000)
+- `SQLALCHEMY_DATABASE_URI`: Database path
+
+## Project Structure
+
+```
+Vuesentials/
+├── app/
+│   ├── components/          # Component features
+│   ├── static/              # CSS, JS, images
+│   └── templates/           # HTML templates
+├── app.py                   # Main app
+├── config.py                # Configuration
+└── requirements.txt         # Dependencies
+```
+
+## Features
+
+✨ Component Gallery  
+🔍 Search & Filter  
+⭐ Featured Components  
+📊 View Tracking  
+📱 Responsive  
+🌓 Dark Mode
+
+## License
+
+MIT License
