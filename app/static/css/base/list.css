@@ -1,0 +1,654 @@
+/* ==============================================
+   COMPONENTS LIST - MATCHING DETAIL STYLE
+   ============================================== */
+
+.components-list-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2.5rem;
+}
+
+/* ==============================================
+   HEADER
+   ============================================== */
+
+.components-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    animation: slideDown 0.6s ease-out;
+}
+
+.components-header h1 {
+    font-size: 2.75rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.components-header p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ==============================================
+   FILTER BAR
+   ============================================== */
+
+.filter-bar-container {
+    background: linear-gradient(135deg, var(--card-bg), var(--bg-secondary));
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.6s ease-out 0.1s backwards;
+}
+
+.filter-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    letter-spacing: 0.8px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Search Input */
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-tertiary);
+    pointer-events: none;
+}
+
+.search-input-wrapper .form-control {
+    padding-left: 2.75rem;
+    padding-right: 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    height: 2.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input-wrapper .form-control:focus {
+    border-color: var(--primary-color);
+    background-color: var(--bg-secondary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.search-input-wrapper .form-control::placeholder {
+    color: var(--text-tertiary);
+}
+
+.btn-clear {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 0.4rem;
+    transition: all 0.3s ease;
+}
+
+.btn-clear:hover {
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+/* Select inputs */
+.form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    height: 2.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    background-color: var(--bg-secondary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Clear Filters Button */
+.btn-clear-filters {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    height: 2.75rem;
+}
+
+.btn-clear-filters:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+/* ==============================================
+   RESULTS INFO
+   ============================================== */
+
+.results-info {
+    animation: slideDown 0.6s ease-out 0.2s backwards;
+}
+
+/* ==============================================
+   COMPONENTS GRID
+   ============================================== */
+
+.components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    animation: fadeIn 0.6s ease-out 0.3s backwards;
+}
+
+/* Component Card */
+.component-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.component-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 12px 32px rgba(37, 99, 235, 0.15);
+    transform: translateY(-8px);
+}
+
+/* Accent Line */
+.card-accent-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), #60a5fa);
+    z-index: 2;
+}
+
+/* Image Section */
+.component-image-section {
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    border-bottom: 1px solid var(--border-color);
+}
+
+.component-image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 1rem;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+}
+
+.component-card:hover .component-image-section img {
+    transform: scale(1.08);
+}
+
+/* Badges */
+.card-badges {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    z-index: 3;
+}
+
+.badge {
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.badge-featured {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+}
+
+.badge-difficulty {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.difficulty-beginner {
+    background: #d1fae5 !important;
+    color: #065f46 !important;
+}
+
+.difficulty-intermediate {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+}
+
+.difficulty-advanced {
+    background: #fee2e2 !important;
+    color: #7f1d1d !important;
+}
+
+/* Card Body */
+.component-card .card-body {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+/* Category Meta */
+.component-meta {
+    margin-bottom: 1rem;
+}
+
+.meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    padding: 0.4rem 0.85rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Title */
+.component-card-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem 0;
+    line-height: 1.4;
+}
+
+.component-card-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: block;
+}
+
+.component-card-title a:hover {
+    color: var(--primary-color);
+}
+
+/* Version */
+.component-version {
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+}
+
+/* Description */
+.component-card-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    flex-grow: 1;
+}
+
+/* Tags */
+.component-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tag {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 0.3rem 0.65rem;
+    border-radius: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.tag-more {
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: default;
+}
+
+.tag-more:hover {
+    background: transparent;
+    color: var(--text-tertiary);
+}
+
+/* Stats */
+.component-card-stats {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.stat i {
+    color: var(--primary-color);
+}
+
+/* Actions */
+.component-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-card-action {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-card-action:hover {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+    flex: 0 1 auto;
+    padding: 0.6rem;
+}
+
+/* ==============================================
+   PAGINATION
+   ============================================== */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 3rem 0;
+    flex-wrap: wrap;
+}
+
+.pagination .page-link {
+    border-radius: 0.625rem;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.6rem 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+}
+
+.pagination .page-link:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==============================================
+   NO RESULTS STATE
+   ============================================== */
+
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    color: var(--text-tertiary);
+    opacity: 0.3;
+    margin-bottom: 1.5rem;
+}
+
+.no-results h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.no-results .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 0.75rem;
+    border-width: 2px;
+}
+
+/* ==============================================
+   ANIMATIONS
+   ============================================== */
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ==============================================
+   RESPONSIVE
+   ============================================== */
+
+@media (max-width: 1200px) {
+    .components-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .components-list-container {
+        padding: 1.5rem;
+    }
+
+    .components-header h1 {
+        font-size: 2rem;
+    }
+
+    .components-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .component-image-section {
+        height: 200px;
+    }
+
+    .filter-bar-container {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .components-list-container {
+        padding: 1rem;
+    }
+
+    .components-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .components-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .component-image-section {
+        height: 180px;
+    }
+
+    .component-card .card-body {
+        padding: 1.25rem;
+    }
+
+    .component-card-title {
+        font-size: 1.05rem;
+    }
+
+    .btn-card-action {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .component-card-stats {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .filter-bar-container {
+        padding: 1rem;
+    }
+}
+
+/* ==============================================
+   DARK MODE
+   ============================================== */
+
+[data-bs-theme="dark"] .component-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-bs-theme="dark"] .component-card:hover {
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.2);
+}
+
+[data-bs-theme="dark"] .component-image-section {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+[data-bs-theme="dark"] .filter-bar-container {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #334155;
+    border-color: #475569;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #1e293b;
+}

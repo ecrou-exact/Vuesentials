@@ -2,7 +2,7 @@ import os
 import uuid
 import random
 import string
-from ..db_class.db import User
+
 
 def isUUID(uid):
     try:
@@ -15,7 +15,7 @@ def generate_api_key(length=60):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
 def get_user_api(api_key):
-    return User.query.filter_by(api_key=api_key).first()
+    return None #User.query.filter_by(api_key=api_key).first()
 
 def verif_api_key(headers):
     if not "X-API-KEY" in headers:

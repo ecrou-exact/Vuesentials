@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="components-list-container">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Header Section -->
+    <div class="components-header mb-5">
+        <h1 class="mb-2">Component Gallery</h1>
+        <p class="text-muted">Explore our collection of Vue.js components</p>
+    </div>
+
+    <!-- Filter Bar Component -->
+    <component-filter-bar ref="filterBar" api-endpoint="/components/list" @update:results="onComponentsUpdated"
+        @loading="search_is_loading = $event">
+    </component-filter-bar>
+
+    <!-- Loading State -->
+    <template v-if="search_is_loading">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-3">Loading components...</p>
+        </div>
+    </template>
+
+    <!-- Components Grid -->
+    <template v-if="!search_is_loading && components_list.length > 0">
+
+        <!-- Results Info -->
+        <div class="results-info mb-4">
+            <small class="text-muted">
+                [[ components_list.length ]] of [[ total_components ]] components
+            </small>
+        </div>
+
+        <!-- Pagination Top -->
+        <pagination-component :current-page="current_page" :total-pages="total_pages" @change-page="changePage">
+        </pagination-component>
+
+        <!-- Grid -->
+        <div class="components-grid">
+            <div v-for="component in components_list" :key="component.id" class="component-card">
+
+                <!-- Accent Line -->
+                <div class="card-accent-line"></div>
+
+                <!-- Image Section -->
+                <div class="component-image-section">
+                    <img :src="component.get_image_url" :alt="component.title"
+                        @error="$event.target.src='/static/images/components/placeholder.png'">
+                </div>
+
+                <!-- Badges -->
+                <div class="card-badges">
+                    <span v-if="component.is_featured" class="badge badge-featured">
+                        <i class="fa-solid fa-star"></i> Featured
+                    </span>
+                    <span class="badge badge-difficulty" :class="`difficulty-${component.difficulty}`">
+                        [[ component.difficulty ]]
+                    </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+
+                    <!-- Category -->
+                    <div class="component-meta">
+                        <span class="meta-badge">
+                            <i class="fa-solid fa-tag me-1"></i>[[ component.category ]]
+                        </span>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="component-card-title">
+                        <a :href="`/components/${component.id}`">
+                            [[ component.title ]]
+                        </a>
+                    </h1>
+                    <p class="component-version">v[[ component.version ]]</p>
+
+                    <!-- Description -->
+                    <p class="component-card-description">
+                        [[ truncateText(component.description, 85) ]]
+                    </p>
+
+                    <!-- Tags -->
+                    <div v-if="component.tags" class="component-card-tags">
+                        <span v-for="(tag, idx) in parseTags(component.tags).slice(0, 2)" :key="idx" class="tag">
+                            [[ tag ]]
+                        </span>
+                        <span v-if="parseTags(component.tags).length > 2" class="tag tag-more">
+                            +[[ parseTags(component.tags).length - 2 ]]
+                        </span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="component-card-stats">
+                        <div class="stat">
+                            <i class="fa-solid fa-eye"></i>
+                            <span>[[ component.views_count ]]</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fa-solid fa-calendar"></i>
+                            <span>[[ formatDate(component.created_at) ]]</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="component-card-actions">
+                        <a :href="`/components/${component.id}`" class="btn-card-action btn-primary">
+                            <i class="fa-solid fa-arrow-right"></i> View
+                        </a>
+                        <button @click="copyCode(component.vue_code)" class="btn-card-action btn-secondary"
+                            title="Copy code">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                        <button @click="downloadComponent(component)" class="btn-card-action btn-secondary"
+                            title="Download">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination Bottom -->
+        <pagination-component :current-page="current_page" :total-pages="total_pages" @change-page="changePage">
+        </pagination-component>
+
+    </template>
+
+    <!-- No Results -->
+    <div v-if="!search_is_loading && components_list.length === 0" class="no-results">
+        <div class="no-results-icon">
+            <i class="fa-solid fa-search"></i>
+        </div>
+        <h3>No components found</h3>
+        <p class="text-muted">Try adjusting your search or filters</p>
+        <button @click="resetFilters" class="btn btn-outline-primary">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset Filters
+        </button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module">
+    const { createApp, ref, onMounted } = Vue;
+    import { message_list } from '/static/js/external_script/toaster.js';
+    import ComponentFilterBar from '/static/js/components/actions/ComponentFilterBar.js';
+    import PaginationComponent from '/static/js/components/actions/ComponentPagination.js';
+
+    createApp({
+        delimiters: ['[[', ']]'],
+        components: {
+            'component-filter-bar': ComponentFilterBar,
+            'pagination-component': PaginationComponent,
+        },
+        setup() {
+            const components_list = ref([]);
+            const total_components = ref(0);
+            const current_page = ref(1);
+            const total_pages = ref(1);
+            const search_is_loading = ref(false);
+            const filterBar = ref(null);
+
+            const onComponentsUpdated = (results) => {
+                components_list.value = results.components || [];
+                total_pages.value = results.total_pages || 1;
+                current_page.value = results.current_page || 1;
+                total_components.value = results.total_components || 0;
+            };
+
+            const changePage = (page) => {
+                if (filterBar.value) {
+                    filterBar.value.fetchComponents(page);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            const truncateText = (text, length) => {
+                if (!text) return '';
+                return text.length > length ? text.substring(0, length) + '...' : text;
+            };
+
+            const formatDate = (dateString) => {
+                if (!dateString) return 'Unknown';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            };
+
+            const copyCode = (code) => {
+                if (!code) return;
+                navigator.clipboard.writeText(code).then(() => {
+                    message_list.value.push({
+                        message: 'Code copied to clipboard!',
+                        category: 'success'
+                    });
+                    setTimeout(() => message_list.value.pop(), 3000);
+                }).catch(() => {
+                    message_list.value.push({
+                        message: 'Failed to copy code',
+                        category: 'danger'
+                    });
+                });
+            };
+
+            const downloadComponent = (component) => {
+                if (!component.vue_code) return;
+                const element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(component.vue_code));
+                element.setAttribute('download', `${component.title.toLowerCase().replace(/\s+/g, '-')}.vue`);
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+
+                message_list.value.push({
+                    message: 'Component downloaded!',
+                    category: 'success'
+                });
+                setTimeout(() => message_list.value.pop(), 3000);
+            };
+
+            const parseTags = (tags) => {
+                if (!tags) return [];
+                if (Array.isArray(tags)) return tags;
+                return tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+            };
+
+            const resetFilters = () => {
+                if (filterBar.value) {
+                    filterBar.value.clearFilters();
+                }
+            };
+
+            onMounted(() => {
+                // Initial load handled by filter bar
+            });
+
+            return {
+                components_list,
+                total_components,
+                current_page,
+                total_pages,
+                search_is_loading,
+                onComponentsUpdated,
+                changePage,
+                truncateText,
+                formatDate,
+                copyCode,
+                downloadComponent,
+                resetFilters,
+                filterBar,
+                message_list,
+                parseTags
+            };
+        }
+    }).mount('#main-container');
+</script>
+{% endblock %}

@@ -1,0 +1,227 @@
+.nav-item {
+  animation: fadeIn 0.3s var(--transition-easing) forwards;
+  opacity: 0;
+}
+
+.nav-item:nth-child(1) { animation-delay: 0.1s; }
+.nav-item:nth-child(2) { animation-delay: 0.2s; }
+.nav-item:nth-child(3) { animation-delay: 0.3s; }
+.nav-item:nth-child(4) { animation-delay: 0.4s; }
+.nav-item:nth-child(5) { animation-delay: 0.5s; }
+
+
+/* Submenu */
+.submenu {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--border-color);
+  display: none;
+  list-style: none;
+}
+
+.submenu.show {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.submenu .nav-link {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.submenu .nav-link:hover {
+  color: var(--primary-color);
+  background-color: transparent;
+  padding-left: 0.75rem;
+}
+
+.submenu .nav-link.active {
+  background-color: transparent;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* Footer Section */
+.sidebar-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: var(--sidebar-hover-bg);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-easing);
+  position: relative;
+}
+
+.nav-link:hover {
+  background-color: var(--sidebar-hover-bg);
+  color: var(--primary-color);
+  padding-left: 1.25rem;
+}
+
+.nav-link.active {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
+  font-weight: 600;
+}
+
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: var(--primary-color);
+  border-radius: 0 3px 3px 0;
+}
+
+.nav-link i {
+  margin-right: 0.75rem;
+  width: 1.25rem;
+  text-align: center;
+}
+
+.nav-chevron {
+  font-size: 0.75rem;
+  transition: transform var(--transition-speed) var(--transition-easing);
+  opacity: 0.6;
+}
+
+.nav-link[aria-expanded="true"] .nav-chevron {
+  transform: rotate(180deg);
+}
+
+#sidebar {
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  transition: all var(--transition-speed) var(--transition-easing);
+}
+
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background-color: var(--sidebar-bg);
+  width: 250px;
+}
+
+/* Logo / Branding */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  gap: 0.75rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-logo i {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.sidebar-divider {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--sidebar-border);
+  opacity: 0.5;
+}
+
+
+.nav-link[type="button"] {
+  background: none !important;
+  border: none !important;
+  padding: 0.875rem 1rem;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-link[type="button"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-link[type="button"]:active {
+  background-color: var(--sidebar-active-bg) !important;
+}

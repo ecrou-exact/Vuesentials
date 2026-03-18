@@ -1,28 +1,95 @@
-<div id="sidebar" class="collapse collapse-horizontal show border-end bg-light">
-    <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 250px; ">
-        <ul class="nav nav-pills flex-column mb-auto">
+<div id="sidebar" class="collapse collapse-horizontal show border-end">
+    <div class="sidebar-container">
+        <a href="/" class="sidebar-logo">
+            <i class="fa-solid fa-rocket"></i>
+            <span>Vuesentials</span>
+        </a>
+
+        <hr class="sidebar-divider">
+
+        <ul class="sidebar-nav">
             <li class="nav-item">
-                <a href="/" class="nav-link {{ 'active' if request.path == '/' else 'link-dark' }}">
-                    <i class="fa-solid fa-house fa-fw me-3"></i> Home
+                <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                    <div class="nav-link-content">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="nav-label">Home</span>
+                    </div>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="/components/create"
+                    class="nav-link {% if request.path == '/components/create' %}active{% endif %}">
+                    <div class="nav-link-content">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="nav-label">Create</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/components/list_page"
+                    class="nav-link {% if request.path == '/components/list_page' %}active{% endif %}">
+                    <div class="nav-link-content">
+                        <i class="fa-solid fa-list"></i>
+                        <span class="nav-label">List</span>
+                    </div>
+                </a>
+            </li>
+
+            <!-- <li class="nav-item">
+                <button class="nav-link" type="button" data-bs-toggle="collapse" data-bs-target="#menuPagination"
+                    aria-expanded="{% if '/pagination' in request.path %}true{% else %}false{% endif %}"
+                    aria-controls="menuPagination">
+                    <div class="nav-link-content">
+                        <i class="fa-solid fa-list"></i>
+                        <span class="nav-label">Pagination</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down nav-chevron"></i>
+                </button>
+
+                <ul class="submenu {% if '/pagination' in request.path %}show{% endif %}" id="menuPagination">
+                    <li class="nav-item">
+                        <a href="/pagination/rules"
+                            class="nav-link {% if request.path == '/pagination/rules' %}active{% endif %}">
+                            <div class="nav-link-content">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span class="nav-label">Rules</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/pagination/settings"
+                            class="nav-link {% if request.path == '/pagination/settings' %}active{% endif %}">
+                            <div class="nav-link-content">
+                                <i class="fa-solid fa-sliders"></i>
+                                <span class="nav-label">Settings</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/pagination/advanced"
+                            class="nav-link {% if request.path == '/pagination/advanced' %}active{% endif %}">
+                            <div class="nav-link-content">
+                                <i class="fa-solid fa-cog"></i>
+                                <span class="nav-label">Advanced</span>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </li> -->
+
+
         </ul>
 
-        <hr>
+        <!-- Footer Section -->
+        <!-- <div class="sidebar-footer">
+            <a href="/profile" class="user-info">
+                <div class="user-avatar">JD</div>
+                <div class="user-details">
+                    <div class="user-name">John Doe</div>
+                    <div class="user-role">Administrator</div>
+                </div>
+            </a>
+        </div> -->
 
-        <div class="dropdown">
-            {% if current_user.is_authenticated %}
-            <a href="/account" class="nav-link {{ 'active' if request.path == '/account' else 'link-dark' }}">
-                <i class="fa-solid fa-user fa-fw me-3"></i> My Profile
-            </a>
-            <a href="/account/logout" class="nav-link link-danger">
-                <i class="fa-solid fa-door-open fa-fw me-3"></i> Logout
-            </a>
-            {% else %}
-            <a href="/login" class="nav-link link-primary">
-                <i class="fa-solid fa-key fa-fw me-3"></i> Login
-            </a>
-            {% endif %}
-        </div>
     </div>
 </div>

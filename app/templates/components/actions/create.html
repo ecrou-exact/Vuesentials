@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="examples-form-container">
+
+    <!-- Header -->
+    <div class="form-header mb-4">
+        <h1>
+            {% if example %}
+            Edit Component Example
+            {% else %}
+            Create New Component Example
+            {% endif %}
+        </h1>
+        <p class="text-muted">
+            {% if example %}
+            Update and refine your component example
+            {% else %}
+            Share a beautifully crafted component with the community
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+
+            <form action="" method="post" id="form" novalidate enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <!-- Basic Information Section -->
+                <div class="form-section mb-4">
+                    <h5 class="section-title mb-3">
+                        <i class="fa-solid fa-info-circle"></i> Basic Information
+                    </h5>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Title -->
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.title.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.title(class_="form-control rounded-3") }}
+                                {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Version -->
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.version.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.version(class_="form-control rounded-3") }}
+                                {% if form.version.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.version.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Category -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.category.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.category(class_="form-select rounded-3") }}
+                                {% if form.category.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.category.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Difficulty -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.difficulty.label.text }}
+                                </label>
+                                {{ form.difficulty(class_="form-select rounded-3") }}
+                                {% if form.difficulty.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.difficulty.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.description.label.text }}
+                                </label>
+                                {{ form.description(class_="form-control rounded-3") }}
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.description.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags (Vue.js Component) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    Tags
+                                </label>
+
+                                <!-- Tags Input Container -->
+                                <div class="tags-input-container" id="tagsContainer">
+                                    <!-- Tags Display -->
+                                    <div class="tags-display" id="tagsList"></div>
+
+                                    <!-- Input Area -->
+                                    <div class="tag-input-area">
+                                        <input type="text" class="tag-input" id="tagInput"
+                                            placeholder="Type a tag and press Enter..." />
+                                        <button type="button" class="btn-add-tag" id="addTagBtn" style="display: none;">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Helper Text -->
+                                <small class="form-text text-muted d-block mt-2">
+                                    Press Enter, comma, or semicolon to add tags
+                                </small>
+
+                                <!-- Suggestions -->
+                                <div class="tag-suggestions mt-3">
+                                    <small class="d-block mb-2 text-muted">Popular tags:</small>
+                                    <div class="suggestion-pills" id="suggestionPills"></div>
+                                </div>
+
+                                <!-- Validation Error -->
+                                <div class="invalid-feedback d-block" id="tagError" style="display: none;"></div>
+
+                                <!-- Hidden Input for Form Submission -->
+                                <input type="hidden" name="tags" id="tagsInput" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Image Upload -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label fw-bold">
+                                    {{ form.image.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                <!-- Render the file input field -->
+                                {{ form.image(class_="form-control rounded-3", accept="image/*") }}
+
+                                {% if form.image.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.image.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    Accepted formats: PNG, JPG, JPEG, GIF.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Section -->
+                <div class="form-section mb-4">
+                    <h5 class="section-title mb-3">
+                        <i class="fa-solid fa-code"></i> Code
+                    </h5>
+
+                    <!-- Vue.js Code (Required) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.vue_code.label.text }} <span class="text-danger">*</span>
+                                </label>
+                                <div class="border rounded-3 overflow-hidden code-editor-container">
+                                    {{ form.vue_code(class_="form-control rounded-0 border-0", style="font-family:
+                                    'Courier New', monospace;") }}
+                                </div>
+                                {% if form.vue_code.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.vue_code.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HTML Code (Optional) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="accordion mb-3">
+                                <div class="accordion-item border rounded-3">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#htmlCollapse"
+                                            aria-expanded="false" aria-controls="htmlCollapse">
+                                            <i class="fa-solid fa-code me-2"></i> HTML Code (Optional)
+                                        </button>
+                                    </h2>
+                                    <div id="htmlCollapse" class="accordion-collapse collapse"
+                                        data-bs-parent="#htmlAccordion">
+                                        <div class="accordion-body p-0">
+                                            <div class="border-top rounded-bottom-3 overflow-hidden">
+                                                {{ form.html_code(class_="form-control rounded-0 border-0",
+                                                style="font-family: 'Courier New', monospace;") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.html_code.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.html_code.errors[0] | safe }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- CSS Code (Optional) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="accordion mb-3">
+                                <div class="accordion-item border rounded-3">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#cssCollapse"
+                                            aria-expanded="false" aria-controls="cssCollapse">
+                                            <i class="fa-solid fa-palette me-2"></i> CSS Styling (Optional)
+                                        </button>
+                                    </h2>
+                                    <div id="cssCollapse" class="accordion-collapse collapse"
+                                        data-bs-parent="#cssAccordion">
+                                        <div class="accordion-body p-0">
+                                            <div class="border-top rounded-bottom-3 overflow-hidden">
+                                                {{ form.css_code(class_="form-control rounded-0 border-0",
+                                                style="font-family: 'Courier New', monospace;") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.css_code.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.css_code.errors[0] | safe }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- JavaScript Code (Optional) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="accordion mb-3">
+                                <div class="accordion-item border rounded-3">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#jsCollapse" aria-expanded="false"
+                                            aria-controls="jsCollapse">
+                                            <i class="fa-brands fa-js me-2"></i> JavaScript Code (Optional)
+                                        </button>
+                                    </h2>
+                                    <div id="jsCollapse" class="accordion-collapse collapse"
+                                        data-bs-parent="#jsAccordion">
+                                        <div class="accordion-body p-0">
+                                            <div class="border-top rounded-bottom-3 overflow-hidden">
+                                                {{ form.javascript_code(class_="form-control rounded-0 border-0",
+                                                style="font-family: 'Courier New', monospace;") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if form.javascript_code.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.javascript_code.errors[0] | safe }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Section -->
+                <div class="form-section mb-4">
+                    <h5 class="section-title mb-3">
+                        <i class="fa-solid fa-book"></i> Documentation
+                    </h5>
+
+                    <!-- Usage Guide -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.usage_guide.label.text }}
+                                </label>
+                                {{ form.usage_guide(class_="form-control rounded-3") }}
+                                <small class="form-text text-muted d-block mt-2">
+                                    Include props, events, methods, and usage examples
+                                </small>
+                                {% if form.usage_guide.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.usage_guide.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.features.label.text }}
+                                </label>
+                                {{ form.features(class_="form-control rounded-3") }}
+                                <small class="form-text text-muted d-block mt-2">
+                                    List key features (one per line)
+                                </small>
+                                {% if form.features.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.features.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label fw-bold ">
+                                    {{ form.requirements.label.text }}
+                                </label>
+                                {{ form.requirements(class_="form-control rounded-3") }}
+                                <small class="form-text text-muted d-block mt-2">
+                                    Dependencies & system requirements
+                                </small>
+                                {% if form.requirements.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.requirements.errors[0] | safe }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Section -->
+                <div class="form-section mb-4">
+                    <h5 class="section-title mb-3">
+                        <i class="fa-solid fa-toggle-on"></i> Status
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.is_featured(class_="form-check-input") }}
+                                <label class="form-check-label fw-bold" for="{{ form.is_featured.id }}">
+                                    {{ form.is_featured.label.text }}
+                                </label>
+                                <small class="d-block text-muted mt-1">
+                                    Show this component on the homepage
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.is_active(class_="form-check-input") }}
+                                <label class="form-check-label fw-bold" for="{{ form.is_active.id }}">
+                                    {{ form.is_active.label.text }}
+                                </label>
+                                <small class="d-block text-muted mt-1">
+                                    Publish this component
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Messages -->
+                {% if error %}
+                <div class="alert alert-danger rounded-3 d-flex align-items-center mb-4 border-0 shadow-sm">
+                    <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+                    <div>{{ error }}</div>
+                </div>
+                {% endif %}
+
+                <!-- Form Actions -->
+                <div class="form-actions mt-5 pt-4 ">
+                    <div class="d-flex gap-3 justify-content-center">
+                        {{ form.submit(class_='btn btn-primary btn-lg px-5') }}
+                        <a href="/examples" class="btn btn-outline-secondary btn-lg px-5">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tagInput = document.getElementById('tagInput');
+        const addTagBtn = document.getElementById('addTagBtn');
+        const tagsList = document.getElementById('tagsList');
+        const tagsHidden = document.getElementById('tagsInput');
+        const tagError = document.getElementById('tagError');
+        const suggestionPills = document.getElementById('suggestionPills');
+
+        let tags = [];
+        const maxTags = 20;
+        const maxTagLength = 30;
+        const suggestedTags = [
+            'pagination', 'responsive', 'vue3', 'forms', 'tables',
+            'buttons', 'modals', 'navigation', 'cards', 'alerts',
+            'accessible', 'animation', 'tooltip', 'dropdown', 'spinner'
+        ];
+
+        // Initialize avec les tags existants si édition
+        function initTags() {
+            const existingTags = tagsHidden.value.split(',').filter(t => t.trim());
+            if (existingTags.length > 0) {
+                tags = existingTags;
+                renderTags();
+            }
+        }
+
+        // Initialize suggestions
+        function initSuggestions() {
+            suggestionPills.innerHTML = '';
+            suggestedTags.forEach(tag => {
+                const pill = document.createElement('button');
+                pill.type = 'button';
+                pill.className = 'suggestion-pill';
+                pill.textContent = tag;
+                pill.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    addTagFromSuggestion(tag);
+                });
+                suggestionPills.appendChild(pill);
+            });
+        }
+
+        function validateTag(tag) {
+            if (tag.length < 2) return { valid: false, error: 'Min 2 characters' };
+            if (tag.length > maxTagLength) return { valid: false, error: `Max ${maxTagLength} chars` };
+            if (!/^[a-zA-Z0-9\-_]+$/.test(tag)) return { valid: false, error: 'Only alphanumeric, dash, underscore' };
+            if (tags.includes(tag)) return { valid: false, error: 'Tag already exists' };
+            if (tags.length >= maxTags) return { valid: false, error: `Max ${maxTags} tags` };
+            return { valid: true };
+        }
+
+        function addTag() {
+            let input = tagInput.value.trim().replace(/[,;]+$/, '').trim();
+            if (!input) return;
+
+            const validation = validateTag(input);
+            if (!validation.valid) {
+                tagError.textContent = validation.error;
+                tagError.style.display = 'block';
+                setTimeout(() => tagError.style.display = 'none', 3000);
+                return;
+            }
+
+            tags.push(input);
+            tagInput.value = '';
+            addTagBtn.style.display = 'none';
+            renderTags();
+        }
+
+        function addTagFromSuggestion(tag) {
+            if (!tags.includes(tag)) {
+                tags.push(tag);
+                tagInput.value = '';
+                addTagBtn.style.display = 'none';
+                renderTags();
+            }
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
+
+        function renderTags() {
+            tagsList.innerHTML = '';
+            tags.forEach((tag, index) => {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'tag-item';
+                tagEl.innerHTML = `
+        <span class="tag-text">${tag}</span>
+        <button type="button" class="tag-remove" title="Remove tag">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      `;
+                tagEl.querySelector('.tag-remove').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    removeTag(index);
+                });
+                tagsList.appendChild(tagEl);
+            });
+            tagsHidden.value = tags.join(',');
+        }
+
+        // Event listeners
+        tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+                e.preventDefault();
+                addTag();
+            }
+        });
+
+        tagInput.addEventListener('input', () => {
+            addTagBtn.style.display = tagInput.value.trim() ? 'flex' : 'none';
+        });
+
+        addTagBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            addTag();
+        });
+
+        tagInput.addEventListener('blur', () => {
+            if (tagInput.value.trim()) {
+                addTag();
+            }
+        });
+
+        // Initialize
+        initTags();
+        initSuggestions();
+    });
+</script>
+{% endblock %}

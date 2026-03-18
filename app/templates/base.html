@@ -4,45 +4,165 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Vuesentials</title>
+    <title>Vuesentials - Modern Dashboard</title>
 
     <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-5.3.0/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='fontawesome-6.3.0/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/select2-bootstrap-5-theme.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery-ui.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/core.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/sidebar.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/external_library/select2.min.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static',filename='css/external_library/select2-bootstrap-5-theme.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/external_library/jquery-ui.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/createEdit.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/detail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/list.css') }}">
+
+    <script src="{{ url_for('static',filename='js/external_script/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/external_script/jquery-ui.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/external_script/popper.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-5.3.0/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/external_script/select2.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/external_script/vue.global.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/external_script/zxcvbn.js') }}"></script>
+
+    <script>
+        (function () {
+            let savedTheme = localStorage.getItem('theme');
+
+            if (!savedTheme) {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                savedTheme = prefersDark ? 'dark' : 'light';
+            }
+
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            document.documentElement.style.backgroundColor = savedTheme === 'dark' ? '#0f172a' : '#fafafa';
+
+            updateThemeIcon(savedTheme);
+        })();
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                if (theme === 'dark') {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+        }
+    </script>
 </head>
 
 <body>
     <div class="container-fluid p-0">
         <div class="d-flex flex-nowrap min-vh-100">
-
             {% include 'sidebar.html' %}
 
-            <main class="col p-4" id="main-container">
-                <button class="btn btn-outline-secondary btn-sm btn-toggle-sidebar" data-bs-target="#sidebar"
-                    data-bs-toggle="collapse">
-                    <i class="fa-solid fa-bars-staggered"></i> Menu
-                </button>
+            <main class="col p-0" id="main-container">
+                <div class="top-bar">
+                    <button class="menu-toggle" data-bs-target="#sidebar" data-bs-toggle="collapse" title="Toggle Menu"
+                        aria-label="Toggle sidebar">
+                        <i class="fa-solid fa-bars-staggered"></i>
+                    </button>
 
-                <section class="content">
-                    {% block content %}{% endblock %}
-                </section>
+                    <button class="theme-toggle" id="bd-theme" type="button" onclick="toggleDarkMode()"
+                        aria-label="Toggle theme">
+                        <i class="fa-solid fa-moon" id="theme-icon"></i>
+                    </button>
+                </div>
+                <div class="content-section">
+                    <div class="content-card">
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+
             </main>
-
+            {% if csrf_token()|safe %}
+            <div style="visibility: hidden; display: none">
+                <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token()|safe }}">
+            </div>
+            {% endif %}
         </div>
     </div>
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-brand">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span>Vuesentials</span>
+                </div>
+                <p class="footer-description">Building beautiful, reusable components for modern web applications</p>
+                <div class="footer-social">
+                    <a href="https://github.com/ecrou-exact/Vuesentials.git" target="_blank" rel="noopener noreferrer"
+                        class="social-link github" title="GitHub Repository">
+                        <i class="fa-brands fa-github"></i>
+                    </a>
+                </div>
+            </div>
 
-    <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/jquery-ui.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/popper.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='bootstrap-5.3.0/js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/select2.min.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/vue.global.js') }}"></script>
-    <script src="{{ url_for('static',filename='js/zxcvbn.js') }}"></script>
+            <div class="footer-links">
+                <div class="footer-column">
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/ecrou-exact/Vuesentials.git" target="_blank">GitHub</a></li>
+                        <li><a href="/pagination/rules">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/ecrou-exact/Vuesentials/issues" target="_blank">Report
+                                Issue</a></li>
+                        <li><a href="https://github.com/ecrou-exact/Vuesentials/pulls" target="_blank">Contribute</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/">Blog</a></li>
+                        <li><a href="/">Tutorial</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
+        <div class="footer-divider"></div>
+
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                <p>&copy; 2026 Vuesentials. Open Source MIT License</p>
+            </div>
+            <div class="footer-extra">
+                <p>Created by <a href="https://github.com/ecrou-exact" target="_blank">ecrou-exact</a></p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            html.style.backgroundColor = newTheme === 'dark' ? '#0f172a' : '#fafafa';
+            updateThemeIcon(newTheme);
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-bs-theme', newTheme);
+                updateThemeIcon(newTheme);
+            }
+        });
+    </script>
     {% block script %}
     <script type="module">
         const { createApp } = Vue
@@ -54,6 +174,7 @@
         }).mount('#main-container')
     </script>
     {% endblock %}
+
 </body>
 
 </html>

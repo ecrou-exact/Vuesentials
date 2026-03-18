@@ -6,10 +6,10 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///ptitcrolle.sqlite"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///vueEsential.sqlite"
     SESSION_TYPE = "sqlalchemy"
     SESSION_SQLALCHEMY_TABLE = "flask_sessions"
-    
+    # sqlite3 instance/vueEsential.sqlite
     @classmethod
     def init_app(cls, app):
         print('THIS APP IS IN DEBUG MODE. \
@@ -17,7 +17,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///ptitcrolle-test.sqlite"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///vueEsential-test.sqlite"
     WTF_CSRF_ENABLED = False
 
     @classmethod
