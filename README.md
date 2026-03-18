@@ -2,7 +2,9 @@
 
 A Vue.js component library platform built with Flask.
 
-![Vuesentials Logo](vuesentials_logo.svg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ecrou-exact/Vuesentials/doc/vuesentials.png" width="300" alt="Vuesentials logo">
+</p>
 
 ## What's Inside?
 
