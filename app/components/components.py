@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, jsonify, render_template, redirect, url_for, request
-from app.components.forms import AddComponentExampleForm
+from app.components.forms import AddComponentExampleForm, EditComponentExampleForm
 from app.utils.utils import form_to_dict
 from . import components_core as ComponentsModels
 
@@ -9,37 +9,113 @@ components_blueprint = Blueprint(
     template_folder='templates',
     static_folder='static'
 )
-
 @components_blueprint.route("/create", methods=["GET", "POST"])
 def create():
-    """Create a new component example"""
     form = AddComponentExampleForm()
     
     if form.validate_on_submit():
         try:
-            # Prepare form data
             form_dict = form_to_dict(form)
-            
-            # Get the image file from the form
             image_file = request.files.get('image')
             form_dict['image'] = image_file
             
-            # Create component
             new_component, message, success = ComponentsModels.CreateComponent(form_dict)
             
             if success:
                 flash(message, 'success')
-                return redirect(url_for('components.create'))
+                return redirect(url_for('components.detail', component_id=new_component.id))
             else:
                 flash(message, 'danger')
-                return render_template('components/actions/create.html', form=form, error=message)
-        
+                return render_template('components/actions/create.html', form=form)
         except Exception as e:
             flash(f"Unexpected error: {str(e)}", 'danger')
-            return render_template('components/actions/create.html', form=form, error=str(e))
+            return render_template('components/actions/create.html', form=form)
+    
+    if form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", 'danger')
     
     return render_template('components/actions/create.html', form=form)
-
+@components_blueprint.route("/edit/<int:component_id>", methods=["GET", "POST"])
+def edit(component_id):
+    component = ComponentsModels.get_component_by_id(component_id)
+    if not component:
+        flash('Component not found', 'danger')
+        return redirect(url_for('components.list'))
+    
+    form = EditComponentExampleForm(example_id=component_id)
+    
+    if request.method == 'GET':
+        form.title.data = component.title
+        form.category.data = component.category
+        form.description.data = component.description
+        form.difficulty.data = component.difficulty
+        form.version.data = component.version
+        if component.tags:
+            form.tags.data = component.tags
+        form.vue_code.data = component.vue_code
+        form.html_code.data = component.html_code
+        form.css_code.data = component.css_code
+        form.javascript_code.data = component.javascript_code
+        form.usage_guide.data = component.usage_guide
+        form.features.data = component.features
+        form.requirements.data = component.requirements
+        form.is_featured.data = component.is_featured
+        form.is_active.data = component.is_active
+        
+        return render_template(
+            'components/actions/create.html',
+            form=form,
+            example=component,
+            current_image_url=component.get_image_url()
+        )
+    
+    elif form.validate_on_submit():
+        try:
+            form_dict = form_to_dict(form)
+            image_file = request.files.get('image')
+            if image_file and image_file.filename:
+                form_dict['image'] = image_file
+            else:
+                form_dict['image'] = None
+            form_dict['id'] = component_id
+            
+            updated_component, message, success = ComponentsModels.UpdateComponent(form_dict)
+            
+            if success:
+                flash(message, 'success')
+                return redirect(url_for('components.detail', component_id=component_id))
+            else:
+                flash(message, 'danger')
+                return render_template(
+                    'components/actions/create.html',
+                    form=form,
+                    example=component,
+                    current_image_url=component.get_image_url()
+                )
+        except Exception as e:
+            flash(f"Unexpected error: {str(e)}", 'danger')
+            return render_template(
+                'components/actions/create.html',
+                form=form,
+                example=component,
+                current_image_url=component.get_image_url()
+            )
+    
+    else:
+        if form.errors:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"{field}: {error}", 'danger')
+    
+    return render_template(
+        'components/actions/create.html',
+        form=form,
+        example=component,
+        current_image_url=component.get_image_url()
+    )
+ 
 @components_blueprint.route("/<int:component_id>", methods=["GET"])
 def detail(component_id):
     """Display component detail page"""
@@ -78,7 +154,7 @@ def get_components_list():
     - difficulty (str): Filter by difficulty level
     """
     try:
-        # Get query parameters
+
         page = request.args.get('page', 1, type=int)
         search_query = request.args.get('search', '', type=str)
         search_field = request.args.get('search_field', 'all', type=str)
@@ -86,8 +162,7 @@ def get_components_list():
         category_filter = request.args.get('category', '', type=str)
         difficulty_filter = request.args.get('difficulty', '', type=str)
         per_page = 12
-        
-        # Get components using core models
+
         paginated, total_count, total_pages = ComponentsModels.get_components_list(
             page=page,
             per_page=per_page,
@@ -101,7 +176,7 @@ def get_components_list():
         if paginated is None:
             return jsonify({'error': 'Failed to fetch components'}), 500
         
-        # Convert components to dict
+
         components_data = [
             ComponentsModels.component_to_dict(component, include_full_code=False)
             for component in paginated.items
@@ -143,17 +218,17 @@ def get_component_detail(component_id):
         if not component:
             return jsonify({'error': 'Component not found'}), 404
         
-        # Increment view count
+
         ComponentsModels.increment_views(component_id)
         
-        # Get related components
+
         related_components = ComponentsModels.get_related_components(
             category=component.category,
             exclude_id=component_id,
             limit=4
         )
         
-        # Convert to dict
+
         component_data = ComponentsModels.component_to_dict(
             component,
             include_full_code=True
@@ -289,9 +364,4 @@ def components_list_page():
     """Render the components list page"""
     return render_template('components/list.html')
  
- 
-# Register blueprint with app
-def register_components_list_routes(app):
-    """Register all components list routes with the Flask app"""
-    app.register_blueprint(components_blueprint)
  

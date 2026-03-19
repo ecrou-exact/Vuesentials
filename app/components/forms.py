@@ -82,7 +82,7 @@ class AddComponentExampleForm(FlaskForm):
     )
 
     # Image Upload (Optional)
-    image = FileField('Image d\'aperçu', validators=[
+    image = FileField('Image', validators=[
         FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Only image files are allowed !'), InputRequired(message='Image is required')
     ])
     
@@ -279,6 +279,10 @@ class EditComponentExampleForm(AddComponentExampleForm):
     def __init__(self, example_id=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.example_id = example_id
+        self.image.validators = [
+        FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Only image files are allowed!'),
+        Optional() 
+    ]
     
     def validate_title(self, field):
         """Allow same title for the current example, but not for others"""

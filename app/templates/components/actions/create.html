@@ -1,8 +1,24 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+{% endblock %}
 {% block content %}
-<div class="examples-form-container">
 
+<div class="examples-form-container" id="container-create-component-example">
+    <div id="loading-spinner" class="loading-overlay-content">
+        <div class="spinner">
+            <div class="spinner-ring"></div>
+            <p class="spinner-text">Loading...</p>
+        </div>
+    </div>
     <!-- Header -->
     <div class="form-header mb-4">
         <h1>
@@ -38,7 +54,7 @@
                         <!-- Title -->
                         <div class="col-md-8">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.title.label.text }} <span class="text-danger">*</span>
                                 </label>
                                 {{ form.title(class_="form-control rounded-3") }}
@@ -53,7 +69,7 @@
                         <!-- Version -->
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.version.label.text }} <span class="text-danger">*</span>
                                 </label>
                                 {{ form.version(class_="form-control rounded-3") }}
@@ -70,7 +86,7 @@
                         <!-- Category -->
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.category.label.text }} <span class="text-danger">*</span>
                                 </label>
                                 {{ form.category(class_="form-select rounded-3") }}
@@ -85,7 +101,7 @@
                         <!-- Difficulty -->
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.difficulty.label.text }}
                                 </label>
                                 {{ form.difficulty(class_="form-select rounded-3") }}
@@ -102,7 +118,7 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.description.label.text }}
                                 </label>
                                 {{ form.description(class_="form-control rounded-3") }}
@@ -115,20 +131,17 @@
                         </div>
                     </div>
 
-                    <!-- Tags (Vue.js Component) -->
+                    <!-- Tags -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     Tags
                                 </label>
 
-                                <!-- Tags Input Container -->
                                 <div class="tags-input-container" id="tagsContainer">
-                                    <!-- Tags Display -->
                                     <div class="tags-display" id="tagsList"></div>
 
-                                    <!-- Input Area -->
                                     <div class="tag-input-area">
                                         <input type="text" class="tag-input" id="tagInput"
                                             placeholder="Type a tag and press Enter..." />
@@ -138,33 +151,45 @@
                                     </div>
                                 </div>
 
-                                <!-- Helper Text -->
                                 <small class="form-text text-muted d-block mt-2">
                                     Press Enter, comma, or semicolon to add tags
                                 </small>
 
-                                <!-- Suggestions -->
                                 <div class="tag-suggestions mt-3">
                                     <small class="d-block mb-2 text-muted">Popular tags:</small>
                                     <div class="suggestion-pills" id="suggestionPills"></div>
                                 </div>
 
-                                <!-- Validation Error -->
-                                <div class="invalid-feedback d-block" id="tagError" style="display: none;"></div>
 
-                                <!-- Hidden Input for Form Submission -->
+
                                 <input type="hidden" name="tags" id="tagsInput" value="" />
                             </div>
                         </div>
                     </div>
                     <!-- Image Upload -->
+                    {% if example and current_image_url %}
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <div class="current-image-preview p-3 rounded-3 border"
+                                style="background: var(--bg-secondary);">
+                                <p class="small text-muted mb-2">
+                                    <i class="fa-solid fa-image me-1"></i> Current Image
+                                </p>
+                                <img src="{{ current_image_url }}" alt="{{ example.title }}" class="img-fluid rounded-2"
+                                    style="max-width: 300px; max-height: 250px; object-fit: contain;">
+                                <p class="small text-muted mt-2">Upload a new image to replace this one</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label class="form-label fw-bold">
-                                    {{ form.image.label.text }} <span class="text-danger">*</span>
+                                    {{ form.image.label.text }}
+                                    {% if not example %}<span class="text-danger">*</span>{% endif %}
                                 </label>
-                                <!-- Render the file input field -->
                                 {{ form.image(class_="form-control rounded-3", accept="image/*") }}
 
                                 {% if form.image.errors %}
@@ -175,7 +200,11 @@
                                 </div>
                                 {% endif %}
                                 <div class="form-text">
+                                    {% if example %}
+                                    Leave empty to keep the current image. Accepted formats: PNG, JPG, JPEG, GIF.
+                                    {% else %}
                                     Accepted formats: PNG, JPG, JPEG, GIF.
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -192,26 +221,27 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.vue_code.label.text }} <span class="text-danger">*</span>
                                 </label>
+
                                 <div class="border rounded-3 overflow-hidden code-editor-container">
-                                    {{ form.vue_code(class_="form-control rounded-0 border-0", style="font-family:
-                                    'Courier New', monospace;") }}
+                                    <component-code-editor :model-value='{{ form.vue_code.data | tojson }}'
+                                        mode="javascript" name="vue_code" height="500px">
+                                    </component-code-editor>
                                 </div>
+                                <input type="hidden" name="vue_code" value="{{ form.vue_code.data or '' }}">
+
                                 {% if form.vue_code.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.vue_code.errors[0] | safe }}
-                                </div>
+                                <div class="invalid-feedback d-block">{{ form.vue_code.errors[0] | safe }}</div>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
-
                     <!-- HTML Code (Optional) -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
-                            <div class="accordion mb-3">
+                            <div class="accordion mb-3" id="htmlAccordion">
                                 <div class="accordion-item border rounded-3">
                                     <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button"
@@ -223,10 +253,17 @@
                                     <div id="htmlCollapse" class="accordion-collapse collapse"
                                         data-bs-parent="#htmlAccordion">
                                         <div class="accordion-body p-0">
-                                            <div class="border-top rounded-bottom-3 overflow-hidden">
-                                                {{ form.html_code(class_="form-control rounded-0 border-0",
-                                                style="font-family: 'Courier New', monospace;") }}
+                                            <div class="border rounded-3 overflow-hidden code-editor-container">
+                                                <component-code-editor :model-value='{{ form.html_code.data | tojson }}'
+                                                    mode="html" name="html_code" height="500px">
+                                                </component-code-editor>
                                             </div>
+                                            <input type="hidden" name="html_code"
+                                                value="{{ form.html_code.data or '' }}">
+                                            {% if form.html_code.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.html_code.errors[0] | safe }}
+                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -254,10 +291,17 @@
                                     <div id="cssCollapse" class="accordion-collapse collapse"
                                         data-bs-parent="#cssAccordion">
                                         <div class="accordion-body p-0">
-                                            <div class="border-top rounded-bottom-3 overflow-hidden">
-                                                {{ form.css_code(class_="form-control rounded-0 border-0",
-                                                style="font-family: 'Courier New', monospace;") }}
+                                            <div class="border rounded-3 overflow-hidden code-editor-container">
+                                                <component-code-editor :model-value='{{ form.css_code.data | tojson }}'
+                                                    mode="css" name="css_code" height="500px">
+                                                </component-code-editor>
                                             </div>
+                                            <input type="hidden" name="css_code" value="{{ form.css_code.data or '' }}">
+
+                                            {% if form.css_code.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.css_code.errors[0] | safe }}
+                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -285,10 +329,24 @@
                                     <div id="jsCollapse" class="accordion-collapse collapse"
                                         data-bs-parent="#jsAccordion">
                                         <div class="accordion-body p-0">
-                                            <div class="border-top rounded-bottom-3 overflow-hidden">
-                                                {{ form.javascript_code(class_="form-control rounded-0 border-0",
-                                                style="font-family: 'Courier New', monospace;") }}
+                                            <div class="border rounded-3 overflow-hidden code-editor-container">
+                                                <component-code-editor
+                                                    :model-value='{{ form.javascript_code.data | tojson }}' mode="css"
+                                                    name="javascript_code" height="500px">
+                                                </component-code-editor>
                                             </div>
+                                            <input type="hidden" name="javascript_code"
+                                                value="{{ form.javascript_code.data or '' }}">
+
+                                            {% if form.javascript_code.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.javascript_code.errors[0] |
+                                                safe }}
+                                            </div>
+                                            {% endif %}
+
+
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -312,7 +370,7 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.usage_guide.label.text }}
                                 </label>
                                 {{ form.usage_guide(class_="form-control rounded-3") }}
@@ -332,7 +390,7 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.features.label.text }}
                                 </label>
                                 {{ form.features(class_="form-control rounded-3") }}
@@ -350,7 +408,7 @@
                         <!-- Requirements -->
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="form-label fw-bold ">
+                                <label class="form-label fw-bold">
                                     {{ form.requirements.label.text }}
                                 </label>
                                 {{ form.requirements(class_="form-control rounded-3") }}
@@ -409,11 +467,11 @@
                 {% endif %}
 
                 <!-- Form Actions -->
-                <div class="form-actions mt-5 pt-4 ">
+                <div class="form-actions mt-5 pt-4">
                     <div class="d-flex gap-3 justify-content-center">
                         {{ form.submit(class_='btn btn-primary btn-lg px-5') }}
-                        <a href="/examples" class="btn btn-outline-secondary btn-lg px-5">
-                            <i class="fa-solid fa-arrow-left me-2"></i> Cancel
+                        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg px-5">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Back
                         </a>
                     </div>
                 </div>
@@ -424,6 +482,8 @@
     </div>
 
 </div>
+{% endblock %}
+{% block script %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const tagInput = document.getElementById('tagInput');
@@ -442,16 +502,22 @@
             'accessible', 'animation', 'tooltip', 'dropdown', 'spinner'
         ];
 
-        // Initialize avec les tags existants si édition
         function initTags() {
-            const existingTags = tagsHidden.value.split(',').filter(t => t.trim());
-            if (existingTags.length > 0) {
-                tags = existingTags;
-                renderTags();
+            const existingTagsValue = tagsHidden.value || '{{ example.tags if example else "" }}';
+
+            if (existingTagsValue) {
+                const existingTags = existingTagsValue
+                    .split(',')
+                    .map(t => t.trim())
+                    .filter(t => t && t.length > 0);
+
+                if (existingTags.length > 0) {
+                    tags = existingTags;
+                    renderTags();
+                }
             }
         }
 
-        // Initialize suggestions
         function initSuggestions() {
             suggestionPills.innerHTML = '';
             suggestedTags.forEach(tag => {
@@ -514,11 +580,11 @@
                 const tagEl = document.createElement('div');
                 tagEl.className = 'tag-item';
                 tagEl.innerHTML = `
-        <span class="tag-text">${tag}</span>
-        <button type="button" class="tag-remove" title="Remove tag">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      `;
+                    <span class="tag-text">${tag}</span>
+                    <button type="button" class="tag-remove" title="Remove tag">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                `;
                 tagEl.querySelector('.tag-remove').addEventListener('click', (e) => {
                     e.preventDefault();
                     removeTag(index);
@@ -528,7 +594,6 @@
             tagsHidden.value = tags.join(',');
         }
 
-        // Event listeners
         tagInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
                 e.preventDefault();
@@ -551,9 +616,81 @@
             }
         });
 
-        // Initialize
         initTags();
         initSuggestions();
+
+
     });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loadingOverlay = document.getElementById('loading-spinner');
+
+        setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+        }, 500);
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlCollapse = document.getElementById('htmlCollapse');
+        const cssCollapse = document.getElementById('cssCollapse');
+        const jsCollapse = document.getElementById('jsCollapse');
+
+        if (htmlCollapse) {
+            htmlCollapse.addEventListener('show.bs.collapse', function () {
+                setTimeout(() => {
+                    const editors = this.querySelectorAll('.CodeMirror');
+                    editors.forEach(editor => {
+                        if (editor.CodeMirror) {
+                            editor.CodeMirror.refresh();
+                        }
+                    });
+                }, 100);
+            });
+        }
+
+        if (cssCollapse) {
+            cssCollapse.addEventListener('show.bs.collapse', function () {
+                setTimeout(() => {
+                    const editors = this.querySelectorAll('.CodeMirror');
+                    editors.forEach(editor => {
+                        if (editor.CodeMirror) {
+                            editor.CodeMirror.refresh();
+                        }
+                    });
+                }, 100);
+            });
+        }
+
+        if (jsCollapse) {
+            jsCollapse.addEventListener('show.bs.collapse', function () {
+                setTimeout(() => {
+                    const editors = this.querySelectorAll('.CodeMirror');
+                    editors.forEach(editor => {
+                        if (editor.CodeMirror) {
+                            editor.CodeMirror.refresh();
+                        }
+                    });
+                }, 100);
+            });
+        }
+    });
+</script>
+<script type="module">
+    const { createApp } = Vue;
+    import ComponentCodeEditor from '/static/js/components/actions/ComponentCodeEditor.js';
+
+    createApp({
+        delimiters: ['[[', ']]'],
+        components: {
+            'component-code-editor': ComponentCodeEditor
+        },
+        setup() {
+            return {
+                ComponentCodeEditor
+            }
+        }
+    }).mount('#container-create-component-example');
 </script>
 {% endblock %}

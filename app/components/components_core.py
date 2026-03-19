@@ -1,11 +1,10 @@
+from flask import current_app
 from sqlalchemy import or_
-
 from .. import db
 from ..db_class.db import ComponentExample
 import datetime
 import os
 import secrets
-from werkzeug.utils import secure_filename
 from PIL import Image
 import io
 
@@ -33,21 +32,18 @@ def validate_image(file):
     """Validate image file"""
     errors = []
     
-    # Check if file exists
     if not file or file.filename == '':
-        return True, []  # Image est optionnelle
-    
-    # Check file extension
+        return True, []  
+
     if not allowed_file(file.filename):
         errors.append('Invalid file type. Allowed: PNG, JPG, JPEG, GIF, WebP')
         return False, errors
     
-    # Check file size
+
     if get_file_size(file) > MAX_FILE_SIZE:
         errors.append(f'File size exceeds {MAX_FILE_SIZE / 1024 / 1024}MB limit')
         return False, errors
     
-    # Try to open as image
     try:
         file.seek(0)
         img = Image.open(file)
@@ -66,39 +62,35 @@ def save_component_image(file, component_id):
     Returns: (filename, error_message) or (None, error_message)
     """
     
-    # Validate image
     is_valid, errors = validate_image(file)
     if not is_valid:
         return None, " | ".join(errors)
     
-    # If no file, return None (image is optional)
     if not file or file.filename == '':
         return None, None
     
     try:
-        # Create upload folder if it doesn't exist
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-        
-        # Generate unique filename
+    
         file_ext = file.filename.rsplit('.', 1)[1].lower()
         filename = f'component_{component_id}_{secrets.token_hex(8)}.{file_ext}'
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         
-        # Open image and resize/optimize
+
         file.seek(0)
         img = Image.open(file)
         
-        # Convert RGBA to RGB if needed (for JPEG)
+
         if img.mode in ('RGBA', 'LA', 'P'):
             background = Image.new('RGB', img.size, (255, 255, 255))
             background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
             img = background
         
-        # Resize to thumbnail size (maintain aspect ratio)
+
         img.thumbnail(IMAGE_THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
         
-        # Save image
+
         img.save(filepath, quality=85, optimize=True)
         
         return filename, None
@@ -106,16 +98,85 @@ def save_component_image(file, component_id):
     except Exception as e:
         return None, f"Error saving image: {str(e)}"
 
+def UpdateComponent(form_dict):
+    try:
+        import os
+        from flask import current_app
+        import datetime
+        
+        component_id = form_dict.get('id')
+        
+        if not component_id:
+            return None, 'Component ID not provided', False
+        
+        component = ComponentExample.query.get(component_id)
+        
+        if not component:
+            return None, f'Component with ID {component_id} not found', False
+        
+        component.title = form_dict.get('title', component.title)
+        component.category = form_dict.get('category', component.category)
+        component.description = form_dict.get('description', component.description)
+        component.difficulty = form_dict.get('difficulty', component.difficulty)
+        component.version = form_dict.get('version', component.version)
+        component.tags = form_dict.get('tags', component.tags)
+        
+        component.vue_code = form_dict.get('vue_code', component.vue_code)
+        component.html_code = form_dict.get('html_code', component.html_code)
+        component.css_code = form_dict.get('css_code', component.css_code)
+        component.javascript_code = form_dict.get('javascript_code', component.javascript_code)
+        
+        component.usage_guide = form_dict.get('usage_guide', component.usage_guide)
+        component.features = form_dict.get('features', component.features)
+        component.requirements = form_dict.get('requirements', component.requirements)
+        
+        component.is_featured = form_dict.get('is_featured', component.is_featured)
+        component.is_active = form_dict.get('is_active', component.is_active)
+        
+        component.updated_at = datetime.datetime.now(tz=datetime.timezone.utc)
+        
+        image_file = form_dict.get('image')
+        
+        if image_file and hasattr(image_file, 'filename') and image_file.filename:
+            old_image = component.image_filename
+            
+            result = save_component_image(image_file, component_id)
+            filename, error = result
+            
+            if filename:
+                component.image_filename = filename
+                
+                if old_image:
+                    try:
+                        old_path = os.path.join(
+                            current_app.config.get('UPLOAD_FOLDER', 'app/static/images/components'),
+                            old_image
+                        )
+                        if os.path.exists(old_path):
+                            os.remove(old_path)
+                    except Exception as e:
+                        print(f"Error deleting old image: {str(e)}")
+            else:
+                return None, error or 'Image upload failed', False
+        
+        db.session.commit()
+        
+        return component, f'Component "{component.title}" updated successfully!', True
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating component: {str(e)}")
+        return None, f'Error updating component: {str(e)}', False
 
 def CreateComponent(data):
     """Create a new component example in the database"""
     try:
-        # Get image file from data
+
         image_file = data.get('image')
         image_filename = None
         image_error = None
         
-        # Create component first without image to get the ID
+
         new_component = ComponentExample(
             title=data.get('title'),
             description=data.get('description', ''),
@@ -137,11 +198,10 @@ def CreateComponent(data):
             updated_at=datetime.datetime.now(tz=datetime.timezone.utc),
         )
         
-        # Add to session to get ID
+
         db.session.add(new_component)
-        db.session.flush()  # Flush to get the ID without committing
-        
-        # Save image if provided
+        db.session.flush()  
+
         if image_file and image_file.filename != '':
             image_filename, image_error = save_component_image(image_file, new_component.id)
             
@@ -149,11 +209,11 @@ def CreateComponent(data):
                 db.session.rollback()
                 return None, f"Image error: {image_error}", False
             
-            # Update component with image filename
+ 
             if image_filename:
                 new_component.image_filename = image_filename
         
-        # Commit all changes
+      
         db.session.commit()
         
         return new_component, "Component created successfully.", True
@@ -290,10 +350,9 @@ def get_components_list(
         tuple: (paginated_results, total_count, total_pages)
     """
     try:
-        # Start with active components
+
         query = ComponentExample.query.filter_by(is_active=True)
-        
-        # Apply search filter
+
         if search_query:
             search_query = search_query.strip()
             
@@ -318,40 +377,37 @@ def get_components_list(
                     )
                 )
         
-        # Apply category filter
+
         if category_filter:
             category_filter = category_filter.strip()
             query = query.filter(
                 ComponentExample.category.ilike(f'%{category_filter}%')
             )
-        
-        # Apply difficulty filter
+
         if difficulty_filter:
             difficulty_filter = difficulty_filter.strip().lower()
             query = query.filter(
                 ComponentExample.difficulty == difficulty_filter
             )
         
-        # Get total count before pagination
         total_count = query.count()
         
-        # Apply sorting
+
         if sort_by == 'oldest':
             query = query.order_by(ComponentExample.created_at.asc())
         elif sort_by == 'most_viewed':
             query = query.order_by(ComponentExample.views_count.desc())
         elif sort_by == 'most_favorites':
             query = query.order_by(ComponentExample.views_count.desc())
-        else:  # 'newest' (default)
+        else:  
             query = query.order_by(ComponentExample.created_at.desc())
         
-        # Paginate
+
         paginated = query.paginate(page=page, per_page=per_page, error_out=False)
         
         return paginated, total_count, paginated.pages
     
     except Exception as e:
-        print(f"Error getting components list: {str(e)}")
         return None, 0, 0
 
 
@@ -377,7 +433,6 @@ def increment_views(component_id):
         return False
     except Exception as e:
         db.session.rollback()
-        print(f"Error incrementing views: {str(e)}")
         return False
 
 
@@ -420,14 +475,9 @@ def component_to_dict(component, include_full_code=True):
                 'requirements': component.requirements,
             })
         else:
-            # Just preview for list view
             data['vue_code'] = component.vue_code[:100] if component.vue_code else ''
-        
-        data['favorites'] = 0  # Placeholder for favorites tracking
-        
         return data
     except Exception as e:
-        print(f"Error converting component to dict: {str(e)}")
         return {}
 
 
@@ -447,7 +497,6 @@ def get_featured_components(limit=6):
             is_featured=True
         ).order_by(ComponentExample.created_at.desc()).limit(limit).all()
     except Exception as e:
-        print(f"Error getting featured components: {str(e)}")
         return []
 
 
@@ -466,7 +515,6 @@ def get_recent_components(limit=8):
             .order_by(ComponentExample.created_at.desc())\
             .limit(limit).all()
     except Exception as e:
-        print(f"Error getting recent components: {str(e)}")
         return []
 
 
@@ -485,7 +533,6 @@ def get_most_viewed_components(limit=8):
             .order_by(ComponentExample.views_count.desc())\
             .limit(limit).all()
     except Exception as e:
-        print(f"Error getting most viewed components: {str(e)}")
         return []
 
 
@@ -513,7 +560,6 @@ def search_components(search_query, limit=10):
             )
         ).limit(limit).all()
     except Exception as e:
-        print(f"Error searching components: {str(e)}")
         return []
 
 
@@ -539,7 +585,6 @@ def get_components_by_category(category, limit=None):
         
         return query.all()
     except Exception as e:
-        print(f"Error getting components by category: {str(e)}")
         return []
 
 
@@ -565,5 +610,4 @@ def get_components_by_difficulty(difficulty, limit=None):
         
         return query.all()
     except Exception as e:
-        print(f"Error getting components by difficulty: {str(e)}")
         return []

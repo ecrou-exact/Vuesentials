@@ -1,7 +1,19 @@
 {% extends 'base.html' %}
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+{% endblock %}
 
 {% block content %}
-<div class="component-detail-container">
+<div id="loading-spinner" class="loading-overlay-content">
+    <div class="spinner">
+        <div class="spinner-ring"></div>
+        <p class="spinner-text">Loading...</p>
+    </div>
+</div>
+<div id="container" class="component-detail-container">
 
     <!-- Header with Image -->
     <div class="component-header">
@@ -48,9 +60,19 @@
                             <i class="fa-solid fa-eye"></i> {{ component.views_count }}
                         </span>
                     </div>
-                    <div class="meta-item">
+                    <div class="meta-item info-group">
                         <span class="meta-label">Created</span>
-                        <span class="meta-value">{{ component.created_at.strftime('%d %b %Y') }}</span>
+                        <div class="meta-value-container">
+                            <span class="meta-value">
+                                <i class="fa-regular fa-calendar-check"></i>
+                                {{ component.created_at.strftime('%d %b %Y') }}
+                            </span>
+
+                            <span class="meta-value update-info">
+                                <i class="fa-solid fa-rotate-right"></i>
+                                {{ component.updated_at.strftime('%d %b %Y') }}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -82,6 +104,10 @@
                         <i class="fa-solid fa-download"></i>
                         Download
                     </button>
+                    <a class="btn-action  secondary " href="/components/edit/{{ component.id }}" title="Edit Component">
+                        <i class="fa-solid fa-pen"></i>
+                        Edit
+                    </a>
                 </div>
 
             </div>
@@ -132,6 +158,13 @@
                 Documentation
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-content"
+                type="button" role="tab" aria-controls="preview-content" aria-selected="false">
+                <i class="fa-solid fa-eye"></i>
+                Preview
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Content -->
@@ -146,7 +179,8 @@
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <pre><code id="vue-code" class="language-vue">{{ component.vue_code }}</code></pre>
+                <component-code-highlight content="{{ component.vue_code }}"
+                    lang="javascript"></component-code-highlight>
             </div>
         </div>
 
@@ -160,7 +194,7 @@
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <pre><code id="html-code" class="language-html">{{ component.html_code }}</code></pre>
+                <component-code-highlight content="{{ component.html_code }}" lang="html"></component-code-highlight>
             </div>
         </div>
         {% endif %}
@@ -175,7 +209,7 @@
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <pre><code id="css-code" class="language-css">{{ component.css_code }}</code></pre>
+                <component-code-highlight content="{{ component.css_code }}" lang="css"></component-code-highlight>
             </div>
         </div>
         {% endif %}
@@ -249,7 +283,18 @@
 
             </div>
         </div>
-
+        <!--Preview Tab-->
+        <div class="tab-pane fade" id="preview-content" role="tabpanel" aria-labelledby="preview-tab">
+            <div class="preview-content">
+                <!-- Preview content goes here -->
+                <div class="preview-container">
+                    <p class="preview-placeholder">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        Preview not available yet.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Related Components -->
@@ -276,77 +321,53 @@
 <script type="module">
     const { createApp } = Vue;
     import { message_list } from '/static/js/external_script/toaster.js';
-
+    import ComponentCodeHighlight from '/static/js/components/actions/ComponentCodeHighlight.js';
     createApp({
         delimiters: ['[[', ']]'],
+        components: {
+            'component-code-highlight': ComponentCodeHighlight
+        },
         setup() {
             return {
-                message_list
+                message_list,
+                ComponentCodeHighlight
             }
         }
-    }).mount('#main-container');
+    }).mount('#container');
 </script>
-
 <script>
-    // Copy code function
-    function copyCode(elementId) {
-        const codeElement = document.getElementById(elementId);
-        if (!codeElement) return;
+    document.addEventListener('DOMContentLoaded', function () {
+        const loadingOverlay = document.getElementById('loading-spinner');
 
-        const code = codeElement.textContent;
+        window.addEventListener('load', () => {
+            hljs.highlightAll();
+        });
 
-        navigator.clipboard.writeText(code).then(() => {
-            const btn = event.target.closest('.code-copy-btn');
-            if (btn) {
-                const originalIcon = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        const observer = new MutationObserver(() => {
+            const codeBlocks = document.querySelectorAll('pre code');
+            if (codeBlocks.length > 0) {
+                let allHighlighted = true;
+                codeBlocks.forEach(block => {
+                    if (!block.classList.contains('hljs')) {
+                        allHighlighted = false;
+                    }
+                });
 
-                setTimeout(() => {
-                    btn.innerHTML = originalIcon;
-                }, 2000);
+                if (allHighlighted) {
+                    loadingOverlay.classList.add('hidden');
+                    observer.disconnect();
+                }
             }
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-            alert('Failed to copy code');
         });
-    }
 
-    // Copy Vue code function
-    function copyVueCode() {
-        const vueCode = document.getElementById('vue-code');
-        if (!vueCode) return;
-
-        const code = vueCode.textContent;
-
-        navigator.clipboard.writeText(code).then(() => {
-            const buttonText = document.getElementById('copyVueButtonText');
-            const originalText = buttonText.textContent;
-            buttonText.textContent = 'Copied!';
-
-            setTimeout(() => {
-                buttonText.textContent = originalText;
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-            alert('Failed to copy code');
+        observer.observe(document.getElementById('container'), {
+            childList: true,
+            subtree: true
         });
-    }
 
-    // Download component
-    function downloadComponent() {
-        const title = '{{ component.title }}';
-        const vueCode = document.getElementById('vue-code');
-
-        if (!vueCode) return;
-
-        const code = vueCode.textContent;
-        const element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(code));
-        element.setAttribute('download', `${title.toLowerCase().replace(/\s+/g, '-')}.vue`);
-        element.style.display = 'none';
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
-    }
+        setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+        }, 200);
+    });
 </script>
 {% endblock %}

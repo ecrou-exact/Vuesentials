@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "prismjs": "^1.30.0"
+  }
+}
