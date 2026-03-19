@@ -87,13 +87,13 @@ pip install -r requirements.txt
 4. Initialize the database
 
 ```bash
-flask db upgrade
+./launch.sh -i
 ```
 
 5. Run the application
 
 ```bash
-python run.py
+./launch.sh -l
 ```
 
 The application will be available at `http://127.0.0.1:7009`
