@@ -21,7 +21,27 @@
     </div>
 </div>
 <div id="container" class="component-detail-container">
-
+    <div aria-live="polite" aria-atomic="true" class="">
+        <div class="toast-container ">
+            <template v-if="message_list">
+                <template v-for="message in message_list" v-key="message.id">
+                    <div :id="`liveToast-${message.id}`" :class="`toast bg-${message.toast_class}`" role="alert"
+                        aria-live="assertive" data-bs-delay="5000" aria-atomic="true"
+                        style="--bs-toast-spacing: 0.5rem;">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <template v-if="message.message">
+                                    <i :class="message.icon" class="me-2"></i> [[message.message]]
+                                </template>
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </div>
     <!-- Header with Image -->
     <div class="component-header">
         <div class="header-content">
@@ -103,7 +123,8 @@
 
                 <!-- Action Buttons -->
                 <div class="component-actions">
-                    <button class="btn-action primary" onclick="copyVueCode()" title="Copy Vue Code">
+                    <button class="btn-action primary" onclick="copyCodeButton('vue-code', event)"
+                        title="Copy Vue Code">
                         <i class="fa-solid fa-copy"></i>
                         <span id="copyVueButtonText">Copy Vue Code</span>
                     </button>
@@ -111,14 +132,46 @@
                         <i class="fa-solid fa-download"></i>
                         Download
                     </button>
+                    {% if current_user.is_admin() %}
                     <a class="btn-action  secondary " href="/components/edit/{{ component.id }}" title="Edit Component">
                         <i class="fa-solid fa-pen"></i>
                         Edit
                     </a>
+                    <button @click="openDeleteModal('{{component.id}}', '{{ component.title }}')"
+                        class="btn-action  danger" title="Delete">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                    {% endif %}
                 </div>
 
             </div>
+            <div class="delete-modal-overlay" v-if="deleteModal.isOpen" @click.self="closeDeleteModal">
+                <div class="delete-modal">
+                    <div class="delete-modal-header">
+                        <h3>Delete Component</h3>
+                        <button class="delete-modal-close" @click="closeDeleteModal">×</button>
+                    </div>
 
+                    <div class="delete-modal-body">
+                        <div class="delete-modal-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <p class="delete-modal-message">
+                            Are you sure you want to delete <strong>[[ deleteModal.componentTitle ]]</strong>?
+                        </p>
+                        <p class="delete-modal-subtext">This action cannot be undone.</p>
+                    </div>
+
+                    <div class="delete-modal-footer">
+                        <button @click="closeDeleteModal" class="btn-cancel">
+                            Cancel
+                        </button>
+                        <button @click="confirmDelete" class="btn-confirm">
+                            <i class="fa-solid fa-trash me-2"></i>Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -182,12 +235,14 @@
             <div class="code-block">
                 <div class="code-header">
                     <span class="code-language">Vue.js</span>
-                    <button class="code-copy-btn" onclick="copyCode('vue-code')" title="Copy code">
+                    <button class="code-copy-btn" onclick="copyCode('vue-code', event)" title="Copy code">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <component-code-highlight content="{{ component.vue_code }}"
-                    lang="javascript"></component-code-highlight>
+                <div id="vue-code-container">
+                    <component-code-highlight content="{{ component.vue_code }}"
+                        lang="javascript"></component-code-highlight>
+                </div>
             </div>
         </div>
 
@@ -197,11 +252,15 @@
             <div class="code-block">
                 <div class="code-header">
                     <span class="code-language">HTML</span>
-                    <button class="code-copy-btn" onclick="copyCode('html-code')" title="Copy code">
+                    <button class="code-copy-btn" onclick="copyCode('html-code', event)" title="Copy code">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <component-code-highlight content="{{ component.html_code }}" lang="html"></component-code-highlight>
+                <div id="html-code-container">
+                    <component-code-highlight content="{{ component.html_code }}"
+                        lang="html"></component-code-highlight>
+                </div>
+
             </div>
         </div>
         {% endif %}
@@ -212,11 +271,14 @@
             <div class="code-block">
                 <div class="code-header">
                     <span class="code-language">CSS</span>
-                    <button class="code-copy-btn" onclick="copyCode('css-code')" title="Copy code">
+                    <button class="code-copy-btn" onclick="copyCode('css-code', event)" title="Copy code">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <component-code-highlight content="{{ component.css_code }}" lang="css"></component-code-highlight>
+                <div id="css-code-container">
+                    <component-code-highlight content="{{ component.css_code }}" lang="css"></component-code-highlight>
+                </div>
+
             </div>
         </div>
         {% endif %}
@@ -227,11 +289,14 @@
             <div class="code-block">
                 <div class="code-header">
                     <span class="code-language">JavaScript</span>
-                    <button class="code-copy-btn" onclick="copyCode('js-code')" title="Copy code">
+                    <button class="code-copy-btn" onclick="copyCode('js-code', event)" title="Copy code">
                         <i class="fa-solid fa-copy"></i>
                     </button>
                 </div>
-                <pre><code id="js-code" class="language-javascript">{{ component.javascript_code }}</code></pre>
+                <div id="js-code-container">
+                    <component-code-highlight content="{{ component.javascript_code }}"
+                        lang="javascript"></component-code-highlight>
+                </div>
             </div>
         </div>
         {% endif %}
@@ -315,8 +380,8 @@
 
 {% block script %}
 <script type="module">
-    const { createApp } = Vue;
-    import { message_list } from '/static/js/external_script/toaster.js';
+    const { createApp, ref } = Vue;
+    import { message_list, create_message } from '/static/js/external_script/toaster.js';
     import ComponentCodeHighlight from '/static/js/components/actions/ComponentCodeHighlight.js';
     import ComponentMarkdownDisplay from '/static/js/components/actions/ComponentMarkdownDisplay.js';
     createApp({
@@ -326,10 +391,62 @@
             'component-markdown-display': ComponentMarkdownDisplay
         },
         setup() {
+
+            const deleteModal = ref({
+                isOpen: false,
+                componentId: null,
+                componentTitle: ''
+            });
+
+            const openDeleteModal = (componentId, componentTitle) => {
+                deleteModal.value.isOpen = true;
+                deleteModal.value.componentId = componentId;
+                deleteModal.value.componentTitle = componentTitle;
+            };
+
+            const closeDeleteModal = () => {
+                deleteModal.value.isOpen = false;
+                deleteModal.value.componentId = null;
+                deleteModal.value.componentTitle = '';
+            };
+
+            const confirmDelete = async () => {
+                try {
+                    const response = await fetch(`/components/delete/${deleteModal.value.componentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token() }}'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        create_message("Failed to delete component", "danger-subtle", true, "fas fa-exclamation-triangle");
+                        return;
+                    }
+
+                    create_message("Component deleted successfully", "success-subtle", true, "fas fa-check");
+
+                    closeDeleteModal();
+
+                    setTimeout(() => {
+                        // go to /components/list_page
+                        window.location.href = '/components/list_page';
+                    }, 1500);
+                } catch (error) {
+                    create_message("Error deleting component", "danger-subtle", true, "fas fa-exclamation-triangle");
+                    console.error('Error:', error);
+                }
+            };
+
             return {
                 message_list,
                 ComponentCodeHighlight,
-                ComponentMarkdownDisplay
+                ComponentMarkdownDisplay,
+                deleteModal,
+                openDeleteModal,
+                closeDeleteModal,
+                confirmDelete
             }
         }
     }).mount('#container');
@@ -368,5 +485,79 @@
             loadingOverlay.classList.add('hidden');
         }, 200);
     });
+</script>
+<script>
+    function copyCode(containerElementId, evt) {
+        let textToCopy = '';
+
+        const container = document.getElementById(containerElementId + '-container');
+
+        if (container) {
+            const preElement = container.querySelector('pre');
+            const codeElement = container.querySelector('code');
+
+            if (preElement) {
+                textToCopy = preElement.textContent;
+            } else if (codeElement) {
+                textToCopy = codeElement.textContent;
+            } else {
+                textToCopy = container.textContent;
+            }
+        }
+
+        if (textToCopy) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = evt.target.closest('.code-copy-btn');
+                const originalHTML = btn.innerHTML;
+
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+    }
+
+    function copyCodeButton(containerElementId, evt) {
+        let textToCopy = '';
+
+        const container = document.getElementById(containerElementId + '-container');
+
+        if (container) {
+            const preElement = container.querySelector('pre');
+            const codeElement = container.querySelector('code');
+
+            if (preElement) {
+                textToCopy = preElement.textContent;
+            } else if (codeElement) {
+                textToCopy = codeElement.textContent;
+            } else {
+                textToCopy = container.textContent;
+            }
+        }
+
+        if (textToCopy) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = evt.target.closest('.btn-action');
+                const originalHTML = btn.innerHTML;
+                const originalText = btn.querySelector('span')?.textContent || '';
+
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Copied!</span>';
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+    }
 </script>
 {% endblock %}

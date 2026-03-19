@@ -11,6 +11,7 @@
   --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
   --primary-light: #dbeafe;
+  --danger-light: #fca5a5;
   
   /* Sidebar */
   --sidebar-bg: #ffffff;
@@ -24,15 +25,18 @@
   --bg-primary: #fafafa;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f3f4f6;
+  --bg-danger: #fee2e2;
   
   /* Text Colors */
   --text-primary: #111827;
   --text-secondary: #6b7280;
   --text-tertiary: #9ca3af;
+  --text-danger: #ef4444;
   
   /* Borders & Dividers */
   --border-color: #e5e7eb;
   --border-light: #f3f4f6;
+  --border-color-danger: #fca5a5;
   
   /* Cards & Components */
   --card-bg: #ffffff;

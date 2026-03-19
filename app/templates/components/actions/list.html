@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="components-list-container" v-cloak>
+<div class="components-list-container" id="components-list-container" v-cloak>
     <!-- Header Section -->
     <div class="components-header mb-5">
         <h1 class="mb-2">Component Gallery</h1>
@@ -110,7 +110,12 @@
                         <a :href="`/components/${component.id}`" class="btn-card-action btn-primary">
                             <i class="fa-solid fa-arrow-right"></i> View
                         </a>
-                        <a class="btn-card-action btn-secondary" href="/components/edit/[[ component.id ]]"
+                        <button @click="downloadComponent(component.id, component.title)"
+                            class="btn-card-action btn-secondary" title="Download">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        {% if current_user.is_admin() %}
+                        <a class="btn-card-action btn-secondary" :href="`/components/edit/${component.id}`"
                             title="Edit Component">
                             <i class="fa-solid fa-pen"></i>
                         </a>
@@ -118,10 +123,7 @@
                             class="btn-card-action btn-secondary" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
-                        <button @click="downloadComponent(component.id, component.title)"
-                            class="btn-card-action btn-secondary" title="Download">
-                            <i class="fa-solid fa-download"></i>
-                        </button>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -324,6 +326,7 @@
             };
 
             return {
+                message_list,
                 components_list,
                 total_components,
                 current_page,
@@ -345,6 +348,6 @@
                 confirmDelete
             };
         }
-    }).mount('#list-container');
+    }).mount('#components-list-container');
 </script>
 {% endblock %}

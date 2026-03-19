@@ -1,4 +1,5 @@
 from flask import Blueprint, flash, jsonify, render_template, redirect, send_file, url_for, request
+from flask_login import current_user, login_required
 from app.components.forms import AddComponentExampleForm, EditComponentExampleForm
 from app.utils.utils import form_to_dict
 from . import components_core as ComponentsModels
@@ -38,7 +39,10 @@ def create():
     
     return render_template('components/actions/create.html', form=form)
 @components_blueprint.route("/edit/<int:component_id>", methods=["GET", "POST"])
+@login_required
 def edit(component_id):
+    if current_user.is_admin() == False:
+        return {'message': 'Unauthorized', 'success': False}, 401
     component = ComponentsModels.get_component_by_id(component_id)
     if not component:
         flash('Component not found', 'danger')
@@ -394,7 +398,10 @@ def download_component(component_id):
         return redirect(url_for('components.list'))
 
 @components_blueprint.route('/delete/<int:component_id>', methods=['GET', 'POST' , 'DELETE'])
+@login_required
 def delete_component(component_id):
+    if current_user.is_admin() == False:
+        return {'message': 'Unauthorized', 'success': False}, 401
     try:
         success, message = ComponentsModels.DeleteComponent(component_id)
         
