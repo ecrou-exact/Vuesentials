@@ -3,6 +3,7 @@ import uuid
 import random
 import string
 
+from ..db_class.db import User
 
 def isUUID(uid):
     try:
@@ -15,7 +16,7 @@ def generate_api_key(length=60):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
 def get_user_api(api_key):
-    return None #User.query.filter_by(api_key=api_key).first()
+    return User.query.filter_by(api_key=api_key).first()
 
 def verif_api_key(headers):
     if not "X-API-KEY" in headers:
@@ -24,7 +25,6 @@ def verif_api_key(headers):
     if not user:
         return {"message": "API key not found"}, 403
     return {}
-
 def form_to_dict(form):
     loc_dict = dict()
     for field in form._fields:

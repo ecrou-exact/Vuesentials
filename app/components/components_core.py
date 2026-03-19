@@ -194,8 +194,8 @@ def CreateComponent(data):
             is_active=data.get('is_active', True),
             is_featured=data.get('is_featured', False),
             views_count=0,
-            created_at=datetime.datetime.now(tz=datetime.timezone.utc),
-            updated_at=datetime.datetime.now(tz=datetime.timezone.utc),
+            created_at=datetime.now(tz=timezone.utc),
+            updated_at=datetime.now(tz=timezone.utc),
         )
         
 
@@ -615,7 +615,7 @@ def get_components_by_difficulty(difficulty, limit=None):
 import os
 import zipfile
 import io
-from datetime import datetime
+from datetime import datetime, timezone
 
 def get_component_zip_file(component_id):
     """

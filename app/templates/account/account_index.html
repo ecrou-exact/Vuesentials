@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="account-container">
+    <div class="account-card">
+        <!-- Header avec Avatar -->
+        <div class="account-header">
+            <div class="account-avatar">
+                {{ current_user.username()[0].upper() }}
+            </div>
+            <div class="account-header-info">
+                <h2>{{ current_user.first_name }} {{ current_user.last_name }}</h2>
+                <p>{{ current_user.role() }} Account</p>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="account-body">
+            <!-- Section: Personal Information -->
+            <div class="account-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-user"></i>
+                    Personal Information
+                </div>
+
+                <div class="info-table">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fa-solid fa-id-badge"></i>
+                            First Name
+                        </div>
+                        <div class="info-value">{{ current_user.first_name }}</div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fa-solid fa-id-badge"></i>
+                            Last Name
+                        </div>
+                        <div class="info-value">{{ current_user.last_name }}</div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <i class="fa-solid fa-envelope"></i>
+                            Email
+                        </div>
+                        <div class="info-value">{{ current_user.email }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: API Key -->
+            <div class="account-section">
+                <div class="section-title">
+                    <i class="fa-solid fa-key"></i>
+                    API Key
+                </div>
+
+                <div class="info-table">
+                    <div class="info-row">
+                        <div class="info-label">
+                            Your API Key
+                        </div>
+                        {% if current_user.api_key %}
+                        <div class="info-value">
+                            <div class="api-key-container">
+                                <span id="api-key" class="api-key blurred">{{ current_user.api_key }}</span>
+                                <button id="toggle-api-key" class="blur-btn" type="button" aria-pressed="false"
+                                    aria-label="Show API key" title="Show API key" data-visible="false">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="api-help-text">
+                                <a href="#">Learn more about the API</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="info-value">
+                            <span class="empty-state">
+                                <i class="fa-solid fa-key-skeleton"></i>
+                                No API key generated yet
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="account-actions">
+                <a href="{{ url_for('account.edit_user') }}" class="btn-edit">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('toggle-api-key');
+        const apiKeySpan = document.getElementById('api-key');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                const isVisible = toggleBtn.getAttribute('data-visible') === 'true';
+
+                if (isVisible) {
+                    apiKeySpan.classList.add('blurred');
+                    toggleBtn.setAttribute('data-visible', 'false');
+                    toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                    toggleBtn.title = 'Show API key';
+                } else {
+                    apiKeySpan.classList.remove('blurred');
+                    toggleBtn.setAttribute('data-visible', 'true');
+                    toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    toggleBtn.title = 'Hide API key';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

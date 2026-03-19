@@ -12,7 +12,7 @@ components_blueprint = Blueprint(
 @components_blueprint.route("/create", methods=["GET", "POST"])
 def create():
     form = AddComponentExampleForm()
-    
+   
     if form.validate_on_submit():
         try:
             form_dict = form_to_dict(form)

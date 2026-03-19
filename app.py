@@ -4,6 +4,8 @@ from flask import render_template, request, Response
 import json
 import os
 
+from app.utils.init_db import create_admin
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--init_db", help="Initialise the db if it not exist", action="store_true")
@@ -25,6 +27,7 @@ def error_page_not_found(e):
 if args.init_db:
     with app.app_context():
         db.create_all()
+        create_admin()
 elif args.recreate_db:
     with app.app_context():
         db.drop_all()

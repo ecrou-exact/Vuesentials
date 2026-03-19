@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='css/base/detail.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/base/list.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/base/404.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/base/account_index.css') }}">
 
     {% block head %}
     {% endblock %}
@@ -82,7 +84,7 @@
 </head>
 
 <body>
-    <div class="container-fluid p-0" id="main-container">
+    <div class="container-fluid p-0" id="main-container" v-cloak>
         <div class="d-flex flex-nowrap min-vh-100">
             {% include 'sidebar.html' %}
 

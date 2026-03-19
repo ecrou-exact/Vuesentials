@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="edit-account-container">
+    <div class="edit-account-card">
+        <div class="edit-account-header">
+            <h2>Edit Profile</h2>
+            <p>Update your account information below</p>
+        </div>
+
+        <form method="post" action="" class="edit-account-form" id="edit-form">
+            {{ form.hidden_tag() }}
+            {% if not edit_mode %}
+            {% endif %}
+
+            <div class="form-section">
+                <h3 class="form-section-title">Personal Information</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.first_name.label(class_="form-label") }}
+                        {{ form.first_name(class_="form-control") }}
+                        {% if form.first_name.errors %}
+                        <div class="form-error">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ form.first_name.errors[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.last_name.label(class_="form-label") }}
+                        {{ form.last_name(class_="form-control") }}
+                        {% if form.last_name.errors %}
+                        <div class="form-error">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ form.last_name.errors[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.email.label(class_="form-label") }}
+                    {{ form.email(class_="form-control") }}
+                    {% if form.email.errors %}
+                    <div class="form-error">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        {{ form.email.errors[0] }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="form-section-title">Password</h3>
+
+                <div class="form-group" id="password-container">
+                    {{ form.password.label(class_="form-label") }}
+                    <p class="form-hint">Leave blank to keep your current password</p>
+
+                    <div class="password-input-wrapper">
+                        {{ form.password(class_="form-control", v_model="password", id="password-input") }}
+                        <button type="button" class="password-toggle" id="togglePasswordIcon" @click="togglePassword">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+
+                    {% if form.password.errors %}
+                    <div class="form-error">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        {{ form.password.errors[0] }}
+                    </div>
+                    {% endif %}
+
+                    <div class="password-rules" v-if="password">
+                        <div class="password-rule" :class="{ valid: password.length >= 8 }">
+                            <i class="fa-solid" :class="password.length >= 8 ? 'fa-check' : 'fa-xmark'"></i>
+                            <span>At least 8 characters</span>
+                        </div>
+
+                        <div class="password-rule" :class="{ valid: /[A-Z]/.test(password) }">
+                            <i class="fa-solid" :class="/[A-Z]/.test(password) ? 'fa-check' : 'fa-xmark'"></i>
+                            <span>At least one uppercase letter</span>
+                        </div>
+
+                        <div class="password-rule" :class="{ valid: /[a-z]/.test(password) }">
+                            <i class="fa-solid" :class="/[a-z]/.test(password) ? 'fa-check' : 'fa-xmark'"></i>
+                            <span>At least one lowercase letter</span>
+                        </div>
+
+                        <div class="password-rule" :class="{ valid: /[0-9]/.test(password) }">
+                            <i class="fa-solid" :class="/[0-9]/.test(password) ? 'fa-check' : 'fa-xmark'"></i>
+                            <span>At least one digit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                {{ form.submit(class_="btn-submit") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module">
+    const { createApp, ref } = Vue;
+
+    createApp({
+        setup() {
+            const password = ref('');
+
+            const togglePassword = () => {
+                const input = document.getElementById("password-input");
+                const icon = document.getElementById("togglePasswordIcon");
+
+                input.type = input.type === "password" ? "text" : "password";
+                icon.classList.toggle("fa-eye");
+                icon.classList.toggle("fa-eye-slash");
+            };
+
+            return { password, togglePassword };
+        }
+    }).mount('#password-container');
+</script>
+{% endblock %}
