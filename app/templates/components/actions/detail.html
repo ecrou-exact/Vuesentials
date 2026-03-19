@@ -350,8 +350,9 @@
                 <!-- Preview content goes here -->
                 <div class="preview-container">
                     <p class="preview-placeholder">
-                        <i class="fa-solid fa-eye-slash"></i>
-                        Preview not available yet.
+                        <a :href="'/paginations?component=component'+{{component.id}}">
+                            Go to Pagination
+                        </a>
                     </p>
                 </div>
             </div>

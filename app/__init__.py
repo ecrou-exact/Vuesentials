@@ -32,9 +32,10 @@ def create_app():
     from .account.account import account_blueprint
     from .home import home_blueprint
     from .components.components import components_blueprint
+    from .components.paginations.paginations import paginations_blueprint
 
     app.register_blueprint(account_blueprint, url_prefix="/account")
-
+    app.register_blueprint(paginations_blueprint, url_prefix="/paginations")
     app.register_blueprint(home_blueprint, url_prefix="/")
     app.register_blueprint(components_blueprint, url_prefix="/components")
 

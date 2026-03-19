@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="pagination-simple-container" id="paginations-container" v-cloak>
+    <div class="row g-0 h-100">
+        <!-- LEFT MENU - SCROLLABLE -->
+        <div class="col-md-3 pagination-left-menu">
+            <div class="p-3">
+                <h6 class="fw-bold mb-3">Pagination Components</h6>
+
+                <div class="pagination-menu-scroll">
+                    <button v-for="(component, index) in paginationComponents" :key="index"
+                        @click="activePaginationId = component.id"
+                        :class="['btn btn-sm w-100 text-start mb-2', activePaginationId === component.id ? 'btn-primary' : 'btn-outline-secondary']">
+                        <i :class="['fas me-2', component.icon]"></i>[[component.name]]
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT CONTENT - FIXED -->
+        <div class="col-md-9 pagination-right-content">
+            <div class="d-flex flex-column h-100">
+                <!-- PAGINATION TOP -->
+                <div class="pagination-top-section">
+                    <div class="p-3 pagination-header-bg">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-3 fw-bold text-uppercase">[[getActiveComponentName()]]</h6>
+                            <a :href="`/components/${getActiveComponentId()}`" class="btn btn-sm btn-primary">
+                                <i class="fas fa-external-link-alt me-2"></i>View Component
+                            </a>
+                        </div>
+
+                        <div class="text-center">
+                            <!-- PAGINATION 1 -->
+                            <div v-if="activePaginationId === 'component1'">
+                                <component-pagination-rulezet :current-page="current_page" :total-pages="total_pages"
+                                    @change-page="changePage">
+                                </component-pagination-rulezet>
+                            </div>
+                            <div v-if="activePaginationId === 'component2'">
+                                test
+                            </div>
+
+                            <!-- ADD YOUR NEW PAGINATION COMPONENTS HERE -->
+                            <!-- Example:
+                            <component-pagination-custom 
+                                v-if="activePaginationId === 'component2'"
+                                :current-page="current_page" 
+                                :total-pages="total_pages"
+                                @change-page="changePage">
+                            </component-pagination-custom>
+                            -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE CONTENT - SCROLLABLE -->
+                <div class="pagination-table-section">
+                    <div class="card border-0 h-100">
+                        <div class="card-header pagination-table-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-table me-2"></i>Data (Page [[current_page]] of [[total_pages]])
+                            </h6>
+                        </div>
+                        <div class="card-body pagination-table-body">
+                            <div v-if="data_list.length > 0" class="table-responsive">
+                                <table class="table table-hover table-sm mb-0">
+                                    <thead>
+                                        <tr class="pagination-table-header-row">
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Content</th>
+                                            <th v-if="showIds" class="pagination-table-muted">UUID</th>
+                                            <th v-if="showTimestamps" class="pagination-table-muted">Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in data_list" :key="item.id">
+                                            <td class="fw-bold pagination-table-id">[[item.id]]</td>
+                                            <td class="fw-500">[[item.name]]</td>
+                                            <td class="pagination-table-content">[[item.content]]</td>
+                                            <td v-if="showIds" class="pagination-table-muted">[[item.uuid.substring(0,
+                                                8)]]...</td>
+                                            <td v-if="showTimestamps" class="pagination-table-muted">
+                                                [[formatDate(item.created_at)]]</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div v-else class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>No data available
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATS FOOTER -->
+                <div class="pagination-footer">
+                    <div class="d-flex justify-content-between align-items-center text-sm pagination-stats">
+                        <span>Total Items: <strong>[[total_data_list]]</strong></span>
+                        <span>Pages: <strong>[[total_pages]]</strong></span>
+                        <div>
+                            <label class="small me-2">
+                                <input type="checkbox" v-model="showIds"> Show IDs
+                            </label>
+                            <label class="small">
+                                <input type="checkbox" v-model="showTimestamps"> Show Timestamps
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module">
+    const { createApp, ref, onMounted } = Vue;
+    import { message_list, create_message } from '/static/js/external_script/toaster.js';
+    import ComponentPaginationRulezet from '/static/js/components/paginations/ComponentPaginationRulezet.js';
+
+
+    createApp({
+        delimiters: ['[[', ']]'],
+        components: {
+            'component-pagination-rulezet': ComponentPaginationRulezet,
+
+        },
+        setup() {
+            /* ==========================================_FETCH_DATA_================================================= */
+
+            const data_list = ref([]);
+            const total_data_list = ref(0);
+            const current_page = ref(1);
+            const total_pages = ref(1);
+            const activePaginationId = ref('component1');
+            const showIds = ref(false);
+            const showTimestamps = ref(true);
+
+            const paginationComponents = ref([
+                { id: 'component1', name: 'Rulezet Pagination', icon: 'fa-solid fa-minus', id_component: '1' },
+                { id: 'component2', name: 'Custom Pagination', icon: 'fa-solid fa-minus', id_component: '2' },
+            ]);
+
+            async function fetchData(page) {
+                const params = new URLSearchParams({ page });
+
+                try {
+                    const res = await fetch(`/fetchData?` + params.toString());
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        data_list.value = data.data;
+                        total_data_list.value = data.total_items;
+                        current_page.value = data.current_page;
+                        total_pages.value = data.total_pages;
+                        create_message(`Loaded page ${data.current_page}`, 'success');
+                    } else {
+                        create_message('Error fetching data', 'error');
+                        console.error('Error:', res.status);
+                    }
+                } catch (error) {
+                    create_message('Error fetching data', 'error');
+                    console.error('Error:', error);
+                }
+            }
+
+
+            const formatDate = (dateString) => {
+                if (!dateString) return '-';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            };
+
+            const getActiveComponentName = () => {
+                const component = paginationComponents.value.find(c => c.id === activePaginationId.value);
+                return component ? component.name : 'Pagination';
+            };
+
+            const getActiveComponentId = () => {
+                const component = paginationComponents.value.find(c => c.id === activePaginationId.value);
+                return component ? component.id_component : '1';
+            };
+
+            onMounted(() => {
+                // Get component ID from URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const componentId = urlParams.get('component');
+
+                // Check if component exists and set it as active
+                if (componentId) {
+                    const componentExists = paginationComponents.value.find(c => c.id === componentId);
+                    if (componentExists) {
+                        activePaginationId.value = componentId;
+                    }
+                }
+
+                fetchData(1);
+            });
+            /* ========================================================================================================= */
+
+            // Rulezet id = 1 
+            const changePage = (page) => {
+                fetchData(page);
+            };
+
+
+
+            return {
+                data_list,
+                total_data_list,
+                current_page,
+                total_pages,
+                activePaginationId,
+                showIds,
+                showTimestamps,
+                paginationComponents,
+                changePage,
+                formatDate,
+                getActiveComponentName,
+                getActiveComponentId,
+                message_list
+            };
+        }
+    }).mount('#paginations-container');
+</script>
+{% endblock %}

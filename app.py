@@ -4,6 +4,8 @@ from flask import render_template, request, Response
 import json
 import os
 
+
+from app.data.data_core import generate_sample_data
 from app.utils.init_db import create_admin
 
 
@@ -28,10 +30,12 @@ if args.init_db:
     with app.app_context():
         db.create_all()
         create_admin()
+        generate_sample_data(user_id=1)
 elif args.recreate_db:
     with app.app_context():
         db.drop_all()
         db.create_all()
+        generate_sample_data(user_id=1)
 elif args.delete_db:
     with app.app_context():
         db.drop_all()

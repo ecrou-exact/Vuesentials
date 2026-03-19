@@ -178,3 +178,31 @@ class ComponentExample(db.Model):
                 'requirements': self.requirements,
             })
         return data
+    
+
+class Data(db.Model):
+    __tablename__ = 'data'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), nullable=True)
+    data = db.Column(db.Text, nullable=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=True, default=lambda: str(uuid.uuid4()), index=True)
+    created_at = db.Column(db.DateTime, nullable=False, index=True)
+    updated_at = db.Column(db.DateTime, nullable=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    content = db.Column(db.Text, nullable=True)
+
+    # Relationship with User
+    user = db.relationship('User', backref=db.backref('data', lazy=True , cascade="all, delete-orphan"))
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'data': self.data,
+            'uuid': self.uuid,
+            'user_id': self.user_id,
+            'content': self.content,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
+   
