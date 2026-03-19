@@ -118,6 +118,10 @@
               border-color var(--transition-speed) var(--transition-easing);
 }
 
+v-cloak {
+  display: none;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -423,3 +427,661 @@ body {
     background-color: #f5f5f5;
     color: #333;
 }
+
+/* ========== Toasts ========== */
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 350px;
+    max-width: 90vw;
+}
+
+.toast {
+    border-radius: 12px;
+    animation: slideIn 0.4s ease-out forwards;
+    overflow: hidden;
+    margin-bottom: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast.bg-success-subtle {
+    background-color: rgba(40, 167, 69, 0.9) !important;
+    color: white;
+}
+
+.toast.bg-danger-subtle {
+    background-color: rgba(220, 53, 69, 0.9) !important;
+    color: white;
+}
+
+.toast.bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.95) !important;
+    color: #333 !important;
+}
+
+.toast.bg-info-subtle {
+    background-color: rgba(23, 162, 184, 0.9) !important;
+    color: white;
+}
+
+.toast .d-flex {
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toast i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.toast-body {
+    flex: 1;
+    margin: 0;
+    font-weight: 500;
+    padding: 0.75rem;
+}
+
+.toast .btn-close {
+    background-color: transparent;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    margin: auto;
+}
+
+.toast .btn-close:hover {
+    opacity: 1;
+}
+
+.toast.bg-success-subtle .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.toast.bg-danger-subtle .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.toast.bg-warning-subtle .btn-close {
+    filter: brightness(0) invert(0);
+}
+
+.toast.bg-info-subtle .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+.toast.removing {
+    animation: slideOut 0.4s ease-in forwards;
+}
+
+/* Dark Mode */
+[data-bs-theme="dark"] .toast {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+[data-bs-theme="dark"] .toast.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.9) !important;
+}
+
+[data-bs-theme="dark"] .toast.bg-danger-subtle {
+    background-color: rgba(178, 34, 52, 0.9) !important;
+}
+
+[data-bs-theme="dark"] .toast.bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.8) !important;
+}
+
+[data-bs-theme="dark"] .toast.bg-info-subtle {
+    background-color: rgba(13, 110, 253, 0.9) !important;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .toast-container {
+        width: calc(100% - 20px);
+        left: 10px;
+        right: 10px;
+    }
+
+    .toast {
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .toast i {
+        font-size: 1rem;
+    }
+
+    .toast-body {
+        padding: 0.5rem;
+    }
+}
+
+
+/* =============================
+   MARKDOWN EDITOR STYLES
+   ============================================ */
+
+.markdown-editor-wrapper {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.markdown-editor-wrapper textarea {
+    display: none;
+}
+
+/* EasyMDE Editor */
+.markdown-editor-wrapper .EasyMDEContainer {
+    border: none !important;
+}
+
+.markdown-editor-wrapper .CodeMirror {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: white;
+    color: #333;
+    border: none;
+}
+
+.markdown-editor-wrapper .CodeMirror-gutters {
+    background-color: #f5f5f5;
+    border-right: 1px solid #e0e0e0;
+}
+
+.markdown-editor-wrapper .CodeMirror-linenumber {
+    color: #999;
+}
+
+.markdown-editor-wrapper .CodeMirror-cursor {
+    border-left: 2px solid #3498db;
+}
+
+.markdown-editor-wrapper .CodeMirror-selected {
+    background-color: #e3f2fd;
+}
+
+/* Toolbar */
+.markdown-editor-wrapper .editor-toolbar {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.markdown-editor-wrapper .editor-toolbar button {
+    background-color: white;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.markdown-editor-wrapper .editor-toolbar button:hover {
+    background-color: #e3f2fd;
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.markdown-editor-wrapper .editor-toolbar button.active {
+    background-color: #3498db;
+    border-color: #3498db;
+    color: white;
+}
+
+.markdown-editor-wrapper .editor-toolbar i {
+    margin-right: 4px;
+}
+
+.markdown-editor-wrapper .editor-toolbar .separator {
+    width: 1px;
+    background-color: #ddd;
+    margin: 0 2px;
+}
+
+/* Preview */
+.markdown-editor-wrapper .editor-preview,
+.markdown-editor-wrapper .editor-preview-side {
+    background-color: white;
+    color: #333;
+}
+
+.markdown-editor-wrapper .editor-preview h1,
+.markdown-editor-wrapper .editor-preview h2,
+.markdown-editor-wrapper .editor-preview h3 {
+    color: #333;
+    border-bottom-color: #3498db;
+}
+
+.markdown-editor-wrapper .editor-preview code {
+    background-color: #f5f5f5;
+    color: #d63384;
+}
+
+.markdown-editor-wrapper .editor-preview pre {
+    background-color: #282c34;
+    color: #abb2bf;
+}
+
+/* Status Bar */
+.markdown-editor-wrapper .editor-statusbar {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+    border-radius: 0 0 12px 12px;
+    padding: 8px 10px;
+}
+
+.markdown-editor-wrapper .editor-statusbar span {
+    margin-right: 15px;
+    font-size: 12px;
+}
+
+/* ============================================
+   DARK MODE STYLES
+   ============================================ */
+
+[data-bs-theme="dark"] .markdown-editor-wrapper {
+    background: #1a1a1a;
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .CodeMirror {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .CodeMirror-gutters {
+    background-color: #252525;
+    border-right-color: #333;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .CodeMirror-linenumber {
+    color: #666;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .CodeMirror-cursor {
+    border-left-color: #5dade2;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .CodeMirror-selected {
+    background-color: #2a3f5f;
+}
+
+/* Dark Mode Toolbar */
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-toolbar {
+    background-color: #252525;
+    border-bottom-color: #333;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-toolbar button {
+    background-color: #2a2a2a;
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-toolbar button:hover {
+    background-color: #5dade2;
+    border-color: #5dade2;
+    color: white;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-toolbar button.active {
+    background-color: #5dade2;
+    border-color: #5dade2;
+    color: white;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-toolbar .separator {
+    background-color: #333;
+}
+
+/* Dark Mode Preview */
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview-side {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview h1,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview h2,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview h3,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview h4,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview h5,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview h6 {
+    color: #fff;
+    border-bottom-color: #5dade2;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview p {
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview code {
+    background-color: #2a2a2a;
+    color: #ff7b7b;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview pre {
+    background-color: #1e1e1e;
+    color: #abb2bf;
+    border-left-color: #5dade2;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview blockquote {
+    border-left-color: #5dade2;
+    color: #999;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview a {
+    color: #5dade2;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview ul,
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview ol {
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview li {
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview table {
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview table th {
+    background-color: #2a2a2a;
+    color: #fff;
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview table td {
+    border-color: #333;
+    color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-preview table tr:hover {
+    background-color: #252525;
+}
+
+/* Dark Mode Status Bar */
+[data-bs-theme="dark"] .markdown-editor-wrapper .editor-statusbar {
+    background-color: #252525;
+    border-top-color: #333;
+    color: #999;
+}
+
+/* EasyMDE Container Dark Mode */
+[data-bs-theme="dark"] .markdown-editor-wrapper .EasyMDEContainer {
+    border-color: #333;
+}
+
+
+[data-bs-theme="dark"] .markdown-editor-wrapper .EasyMDEContainer.sided .CodeMirror {
+    border-right-color: #333;
+}
+
+/* Fullscreen Mode */
+.markdown-editor-wrapper.side-by-side .editor-preview {
+    background-color: #1e1e1e;
+}
+
+.markdown-editor-wrapper.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    border-radius: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .markdown-editor-wrapper .editor-toolbar {
+        padding: 8px;
+    }
+
+    .markdown-editor-wrapper .editor-toolbar button {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+
+    .markdown-editor-wrapper .CodeMirror {
+        font-size: 12px;
+    }
+}
+
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.delete-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 400px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delete-modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.delete-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.delete-modal-close:hover {
+    color: #2c3e50;
+}
+
+.delete-modal-body {
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.delete-modal-icon {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.delete-modal-message {
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.delete-modal-message strong {
+    color: #e74c3c;
+}
+
+.delete-modal-subtext {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.delete-modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    padding: 10px 20px;
+    border: 1px solid #e0e0e0;
+    background: white;
+    color: #7f8c8d;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background: #f5f5f5;
+    border-color: #bdc3c7;
+}
+
+.btn-confirm {
+    padding: 10px 20px;
+    border: none;
+    background: #e74c3c;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-confirm:hover {
+    background: #c0392b;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+/* Dark Mode */
+[data-bs-theme="dark"] .delete-modal {
+    background: #1a1a2e;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .delete-modal-header {
+    border-bottom-color: #333;
+}
+
+[data-bs-theme="dark"] .delete-modal-header h3 {
+    color: #ecf0f1;
+}
+
+[data-bs-theme="dark"] .delete-modal-close {
+    color: #bdc3c7;
+}
+
+[data-bs-theme="dark"] .delete-modal-close:hover {
+    color: #ecf0f1;
+}
+
+[data-bs-theme="dark"] .delete-modal-body {
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .delete-modal-message {
+    color: #ecf0f1;
+}
+
+[data-bs-theme="dark"] .delete-modal-footer {
+    border-top-color: #333;
+}
+
+[data-bs-theme="dark"] .btn-cancel {
+    background: #2a2a3e;
+    color: #bdc3c7;
+    border-color: #333;
+}
+
+[data-bs-theme="dark"] .btn-cancel:hover {
+    background: #3a3a4e;
+    border-color: #444;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .delete-modal {
+        width: 95%;
+        max-width: none;
+    }
+
+    .delete-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+        width: 100%;
+    }       
+}                                                                                                                                                                                                                                                                                                                                   

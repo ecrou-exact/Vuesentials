@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, json
 from sqlalchemy import or_
 from .. import db
 from ..db_class.db import ComponentExample
@@ -611,3 +611,212 @@ def get_components_by_difficulty(difficulty, limit=None):
         return query.all()
     except Exception as e:
         return []
+
+import os
+import zipfile
+import io
+from datetime import datetime
+
+def get_component_zip_file(component_id):
+    """
+    Create a ZIP file containing all component files organized in folders
+    
+    Structure:
+    component-name/
+    ├── vue/
+    │   └── component.vue
+    ├── html/
+    │   └── template.html
+    ├── css/
+    │   └── styles.css
+    ├── javascript/
+    │   └── script.js
+    ├── docs/
+    │   ├── usage-guide.md
+    │   ├── features.md
+    │   └── requirements.md
+    └── metadata.json
+    """
+    try:
+        component = ComponentExample.query.filter_by(id=component_id).first()
+        
+        if not component:
+            return None
+        
+        # Create in-memory ZIP file
+        zip_buffer = io.BytesIO()
+        
+        # Create ZIP with component name as root folder
+        component_folder = component.title.replace(' ', '-').lower()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            
+            # Vue code
+            if component.vue_code:
+                zip_file.writestr(
+                    f'{component_folder}/vue/component.vue',
+                    component.vue_code
+                )
+            
+            # HTML code
+            if component.html_code:
+                zip_file.writestr(
+                    f'{component_folder}/html/template.html',
+                    component.html_code
+                )
+            
+            # CSS code
+            if component.css_code:
+                zip_file.writestr(
+                    f'{component_folder}/css/styles.css',
+                    component.css_code
+                )
+            
+            # JavaScript code
+            if component.javascript_code:
+                zip_file.writestr(
+                    f'{component_folder}/javascript/script.js',
+                    component.javascript_code
+                )
+            
+            # Documentation files
+            docs_content = {}
+            
+            if component.usage_guide:
+                zip_file.writestr(
+                    f'{component_folder}/docs/usage-guide.md',
+                    component.usage_guide
+                )
+            
+            if component.features:
+                zip_file.writestr(
+                    f'{component_folder}/docs/features.md',
+                    component.features
+                )
+            
+            if component.requirements:
+                zip_file.writestr(
+                    f'{component_folder}/docs/requirements.md',
+                    component.requirements
+                )
+            
+            # Create metadata file
+            metadata = {
+                'title': component.title,
+                'description': component.description,
+                'version': component.version,
+                'category': component.category,
+                'difficulty': component.difficulty,
+                'tags': component.tags.split(',') if component.tags else [],
+                'created_at': component.created_at.isoformat() if component.created_at else None,
+                'updated_at': component.updated_at.isoformat() if component.updated_at else None,
+            }
+            
+            zip_file.writestr(
+                f'{component_folder}/metadata.json',
+                json.dumps(metadata, indent=2)
+            )
+            
+            # Create README
+            readme_content = f"""# {component.title}
+
+**Version:** {component.version}
+**Category:** {component.category}
+**Difficulty:** {component.difficulty}
+
+## Description
+
+{component.description or 'No description provided'}
+
+## Tags
+
+{', '.join(component.tags.split(',')) if component.tags else 'No tags'}
+
+## File Structure
+```
+{component_folder}/
+├── vue/
+│   └── component.vue           # Vue component code
+├── html/
+│   └── template.html           # HTML template
+├── css/
+│   └── styles.css              # CSS styles
+├── javascript/
+│   └── script.js               # JavaScript code
+├── docs/
+│   ├── usage-guide.md          # How to use this component
+│   ├── features.md             # Component features
+│   └── requirements.md         # Requirements & dependencies
+├── metadata.json               # Component metadata
+└── README.md                   # This file
+```
+
+## Usage
+
+See `docs/usage-guide.md` for detailed usage instructions.
+
+## Features
+
+See `docs/features.md` for a list of features.
+
+## Requirements
+
+See `docs/requirements.md` for dependencies and requirements.
+
+---
+
+Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+"""
+            
+            zip_file.writestr(
+                f'{component_folder}/README.md',
+                readme_content
+            )
+        
+        # Reset buffer position to beginning
+        zip_buffer.seek(0)
+        return zip_buffer
+        
+    except Exception as e:
+        print(f"Error creating ZIP file: {str(e)}")
+        return None
+    
+def DeleteComponent(component_id):
+    """
+    Delete a component by ID
+    
+    Args:
+        component_id (int): Component ID to delete
+        
+    Returns:
+        tuple: (success: bool, message: str)
+    """
+    try:
+        component = ComponentExample.query.filter_by(id=component_id).first()
+        
+        if not component:
+            return False, "Component not found"
+        
+
+        if component.image_filename:
+            image_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                'static',
+                'images',
+                'components',
+                component.image_filename
+            )
+            if os.path.exists(image_path):
+                try:
+                    os.remove(image_path)
+                except Exception as e:
+                    print(f"Error deleting image: {str(e)}")
+
+        db.session.delete(component)
+        db.session.commit()
+        
+        return True, f"Component '{component.title}' deleted successfully"
+    
+    except Exception as e:
+        db.session.rollback()
+        return False, f"Error deleting component: {str(e)}"

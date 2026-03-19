@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, jsonify, render_template, redirect, url_for, request
+from flask import Blueprint, flash, jsonify, render_template, redirect, send_file, url_for, request
 from app.components.forms import AddComponentExampleForm, EditComponentExampleForm
 from app.utils.utils import form_to_dict
 from . import components_core as ComponentsModels
@@ -364,4 +364,43 @@ def components_list_page():
     """Render the components list page"""
     return render_template('components/list.html')
  
- 
+@components_blueprint.route('/download/<int:component_id>', methods=['GET'])
+def download_component(component_id):
+    """Download component as ZIP file"""
+    try:
+        component = ComponentsModels.get_component_by_id(component_id)
+        
+        if not component:
+            flash('Component not found', 'danger')
+            return redirect(url_for('components.list'))
+        
+        zip_file = ComponentsModels.get_component_zip_file(component_id)
+        
+        if not zip_file:
+            flash('Error creating ZIP file', 'danger')
+            return redirect(url_for('components.detail', component_id=component_id))
+        
+        # Increment views
+        component.increment_views()
+        
+        return send_file(
+            zip_file,
+            as_attachment=True,
+            download_name=f'{component.title.replace(" ", "-").lower()}-v{component.version}.zip',
+            mimetype='application/zip'
+        )
+    except Exception as e:
+        flash(f'Error downloading component: {str(e)}', 'danger')
+        return redirect(url_for('components.list'))
+
+@components_blueprint.route('/delete/<int:component_id>', methods=['GET', 'POST' , 'DELETE'])
+def delete_component(component_id):
+    try:
+        success, message = ComponentsModels.DeleteComponent(component_id)
+        
+        if success:
+            return {'message': message, 'success': True}, 200
+        else:
+            return {'message': message, 'success': False}, 400
+    except Exception as e:
+        return {'message': f'Error: {str(e)}', 'success': False}, 500

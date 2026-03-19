@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="components-list-container">
-
-
-
+<div class="components-list-container" v-cloak>
     <!-- Header Section -->
     <div class="components-header mb-5">
         <h1 class="mb-2">Component Gallery</h1>
@@ -113,12 +110,16 @@
                         <a :href="`/components/${component.id}`" class="btn-card-action btn-primary">
                             <i class="fa-solid fa-arrow-right"></i> View
                         </a>
-                        <button @click="copyCode(component.vue_code)" class="btn-card-action btn-secondary"
-                            title="Copy code">
-                            <i class="fa-solid fa-copy"></i>
+                        <a class="btn-card-action btn-secondary" href="/components/edit/[[ component.id ]]"
+                            title="Edit Component">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <button @click="openDeleteModal(component.id, component.title)"
+                            class="btn-card-action btn-secondary" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
                         </button>
-                        <button @click="downloadComponent(component)" class="btn-card-action btn-secondary"
-                            title="Download">
+                        <button @click="downloadComponent(component.id, component.title)"
+                            class="btn-card-action btn-secondary" title="Download">
                             <i class="fa-solid fa-download"></i>
                         </button>
                     </div>
@@ -126,7 +127,34 @@
                 </div>
             </div>
         </div>
+        <!-- Delete Confirmation Modal -->
+        <div class="delete-modal-overlay" v-if="deleteModal.isOpen" @click.self="closeDeleteModal">
+            <div class="delete-modal">
+                <div class="delete-modal-header">
+                    <h3>Delete Component</h3>
+                    <button class="delete-modal-close" @click="closeDeleteModal">×</button>
+                </div>
 
+                <div class="delete-modal-body">
+                    <div class="delete-modal-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <p class="delete-modal-message">
+                        Are you sure you want to delete <strong>[[ deleteModal.componentTitle ]]</strong>?
+                    </p>
+                    <p class="delete-modal-subtext">This action cannot be undone.</p>
+                </div>
+
+                <div class="delete-modal-footer">
+                    <button @click="closeDeleteModal" class="btn-cancel">
+                        Cancel
+                    </button>
+                    <button @click="confirmDelete" class="btn-confirm">
+                        <i class="fa-solid fa-trash me-2"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
         <!-- Pagination Bottom -->
         <pagination-component :current-page="current_page" :total-pages="total_pages" @change-page="changePage">
         </pagination-component>
@@ -151,7 +179,7 @@
 {% block script %}
 <script type="module">
     const { createApp, ref, onMounted } = Vue;
-    import { message_list } from '/static/js/external_script/toaster.js';
+    import { message_list, create_message } from '/static/js/external_script/toaster.js';
     import ComponentFilterBar from '/static/js/components/actions/ComponentFilterBar.js';
     import PaginationComponent from '/static/js/components/actions/ComponentPagination.js';
 
@@ -214,22 +242,29 @@
                 });
             };
 
-            const downloadComponent = (component) => {
-                if (!component.vue_code) return;
-                const element = document.createElement('a');
-                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(component.vue_code));
-                element.setAttribute('download', `${component.title.toLowerCase().replace(/\s+/g, '-')}.vue`);
-                element.style.display = 'none';
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
+            async function downloadComponent(componentId, componentTitle) {
+                try {
+                    const response = await fetch(`/components/download/${componentId}`);
 
-                message_list.value.push({
-                    message: 'Component downloaded!',
-                    category: 'success'
-                });
-                setTimeout(() => message_list.value.pop(), 3000);
-            };
+                    if (!response.ok) {
+                        create_message("Failed to download component", "danger-subtle", true, "fas fa-exclamation-triangle");
+                    }
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `component-${componentTitle}.zip`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+
+                    create_message("Component downloaded successfully", "success-subtle", true, "fas fa-check");
+                } catch (error) {
+                    create_message("Failed to download component", "danger-subtle", true, "fas fa-exclamation-triangle");
+                }
+            }
 
             const parseTags = (tags) => {
                 if (!tags) return [];
@@ -243,9 +278,50 @@
                 }
             };
 
-            onMounted(() => {
-                // Initial load handled by filter bar
+            const deleteModal = ref({
+                isOpen: false,
+                componentId: null,
+                componentTitle: ''
             });
+
+            const openDeleteModal = (componentId, componentTitle) => {
+                deleteModal.value.isOpen = true;
+                deleteModal.value.componentId = componentId;
+                deleteModal.value.componentTitle = componentTitle;
+            };
+
+            const closeDeleteModal = () => {
+                deleteModal.value.isOpen = false;
+                deleteModal.value.componentId = null;
+                deleteModal.value.componentTitle = '';
+            };
+
+            const confirmDelete = async () => {
+                try {
+                    const response = await fetch(`/components/delete/${deleteModal.value.componentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token() }}'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        create_message("Failed to delete component", "danger-subtle", true, "fas fa-exclamation-triangle");
+                        return;
+                    }
+
+                    create_message("Component deleted successfully", "success-subtle", true, "fas fa-check");
+                    closeDeleteModal();
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } catch (error) {
+                    create_message("Error deleting component", "danger-subtle", true, "fas fa-exclamation-triangle");
+                    console.error('Error:', error);
+                }
+            };
 
             return {
                 components_list,
@@ -262,7 +338,11 @@
                 resetFilters,
                 filterBar,
                 message_list,
-                parseTags
+                parseTags,
+                deleteModal,
+                openDeleteModal,
+                closeDeleteModal,
+                confirmDelete
             };
         }
     }).mount('#main-container');

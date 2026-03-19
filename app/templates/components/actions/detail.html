@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
 {% block head %}
+<!-- CodeMirror Dispaly -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+
+
+<!-- Markdown Display -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -232,7 +239,6 @@
         <!-- Documentation Tab -->
         <div class="tab-pane fade" id="docs-content" role="tabpanel" aria-labelledby="docs-tab">
             <div class="documentation">
-
                 <!-- Usage Guide -->
                 {% if component.usage_guide %}
                 <div class="doc-section">
@@ -240,7 +246,8 @@
                         <i class="fa-solid fa-circle-info"></i> Usage Guide
                     </h3>
                     <div class="doc-content">
-                        {{ component.usage_guide | safe }}
+                        <component-markdown-display
+                            :content='{{ component.usage_guide | tojson | safe }}'></component-markdown-display>
                     </div>
                 </div>
                 {% endif %}
@@ -252,13 +259,8 @@
                         <i class="fa-solid fa-star"></i> Features
                     </h3>
                     <div class="doc-content">
-                        <ul class="features-list">
-                            {% for feature in component.features.split('\n') %}
-                            {% if feature.strip() %}
-                            <li>{{ feature.strip() }}</li>
-                            {% endif %}
-                            {% endfor %}
-                        </ul>
+                        <component-markdown-display
+                            :content='{{ component.features | tojson | safe }}'></component-markdown-display>
                     </div>
                 </div>
                 {% endif %}
@@ -270,17 +272,11 @@
                         <i class="fa-solid fa-cube"></i> Requirements
                     </h3>
                     <div class="doc-content">
-                        <ul class="requirements-list">
-                            {% for req in component.requirements.split('\n') %}
-                            {% if req.strip() %}
-                            <li>{{ req.strip() }}</li>
-                            {% endif %}
-                            {% endfor %}
-                        </ul>
+                        <component-markdown-display
+                            :content='{{ component.requirements | tojson | safe }}'></component-markdown-display>
                     </div>
                 </div>
                 {% endif %}
-
             </div>
         </div>
         <!--Preview Tab-->
@@ -322,15 +318,18 @@
     const { createApp } = Vue;
     import { message_list } from '/static/js/external_script/toaster.js';
     import ComponentCodeHighlight from '/static/js/components/actions/ComponentCodeHighlight.js';
+    import ComponentMarkdownDisplay from '/static/js/components/actions/ComponentMarkdownDisplay.js';
     createApp({
         delimiters: ['[[', ']]'],
         components: {
-            'component-code-highlight': ComponentCodeHighlight
+            'component-code-highlight': ComponentCodeHighlight,
+            'component-markdown-display': ComponentMarkdownDisplay
         },
         setup() {
             return {
                 message_list,
-                ComponentCodeHighlight
+                ComponentCodeHighlight,
+                ComponentMarkdownDisplay
             }
         }
     }).mount('#container');

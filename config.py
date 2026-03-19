@@ -31,3 +31,10 @@ config = {
     'testing': TestingConfig,
     'default': DevelopmentConfig
 }
+
+# python backup.py -b              # create a new backup
+# python backup.py -l              # list all available backups
+
+# python restore.py -i             # Restore the latest backup
+# python restore.py -l             # List all available backups
+# python restore.py -r [filename]   # Restore a specific backup
