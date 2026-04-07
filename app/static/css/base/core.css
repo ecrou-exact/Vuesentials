@@ -1091,3 +1091,44 @@ body {
 }
 
 
+.menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background: transparent;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.menu-toggle:hover {
+    background: var(--light-bg-color);
+    border-color: var(--rule-name-color);
+    color: var(--rule-name-color);
+    box-shadow: 0 2px 8px rgba(10, 88, 202, 0.15);
+    transform: scale(1.05);
+}
+
+.menu-toggle:active {
+    transform: scale(0.95);
+    box-shadow: none;
+}
+
+.menu-toggle i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.menu-toggle:hover i {
+    transform: rotate(90deg);
+}
+
+.menu-toggle:focus-visible {
+    outline: 2px solid var(--rule-name-color);
+    outline-offset: 3px;
+}
